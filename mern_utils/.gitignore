@@ -1,0 +1,17 @@
+/target
+/classes
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+*~
+/.lein-*
+/.nrepl-port
+/resources/public/js/out
+/logs
+/node_modules
+npm-debug.log
+.nvmrc
+main.js
+app.json
+package.json
