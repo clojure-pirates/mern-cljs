@@ -5,6 +5,7 @@ What is it?
 - Stack with MongoDB Express React Node.js and ClojureScript
 - Build React backed web apps in Clojure (reagent + kioo)
 - Login with a social network account via Passport.js
+- Async worker via RabbitMQ
 
 For now, this repo serves to share the knowledge on how to achieve above
 and I don't intend to release a library or framework :)
@@ -56,11 +57,56 @@ page to fetch `me` resource with proper authentication.
 
 ## Async tasks
 
+If you run async task, install and run RabbitMQ first:
+
 ```
 brew install rabbitmq
 brew services start rabbitmq
 ```
-http://localhost:15672/
+
+Then uncomment `create-amqp-conn` around Ln. 39 of `example/api/src/api/core.cljs`:
+
+```
+...
+(defn server [success]
+; Activate the next line if you want to run async task 
+; (create-amqp-conn amqp-endpoint)
+...
+```
+
+Recompile and run api instance:
+
+```
+cd example/api
+lein compile
+lein run
+```
+
+Start worker instance:
+
+```
+cd example/worker
+lein compile
+lein run
+```
+
+Activate RabbitMQ management dashboard plugin:
+
+```
+rabbitmq-plugins enable rabbitmq_management
+```
+
+Point your browser to http://localhost:15672/#/connections to see the connections.
+There should be one from api instance and one from worker.
+
+Point your browser to http://localhost:5000/task to trigger a trivial task.
+Check the console of worker instance to see if the task was received. This should
+look like:
+
+```
+ [*] Waiting for messages. To exit press CTRL+C
+ [x] Received message hello
+```
 
 ## Issues
 

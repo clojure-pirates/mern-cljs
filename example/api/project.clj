@@ -32,6 +32,8 @@
                        [morgan  "~1.0.0"]
                        [body-parser  "~1.0.0"]
                        [cookie-parser  "~1.0.0"]
+                       [amqplib "latest"]
+                       [when "latest"]
                        ]
         :root :root}
 

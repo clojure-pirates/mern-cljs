@@ -5,9 +5,14 @@
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
     [mern-utils.lib :refer [local-ip]]
+    [mern-utils.amqp :refer [create-amqp-conn]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
-    [common.config :refer [MONGODB-DOMAIN MONGODB-PORT MONGODB-DBNAME API-DOMAIN API-PORT WWW-DOMAIN WWW-PORT config-auth cors-options]]
+    [common.config :refer [MONGODB-DOMAIN MONGODB-PORT MONGODB-DBNAME
+                           RABBITMQ-DOMAIN RABBITMQ-PORT
+                           API-DOMAIN API-PORT
+                           WWW-DOMAIN WWW-PORT
+                           config-auth cors-options]]
     [common.models :refer [user]]
     [api.handlers :refer [route-table
                           homepage-handler
@@ -27,7 +32,11 @@
 
 (def mongodb-endpoint (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
 
+(def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
+
 (defn server [success]
+  ; Activate the next line if you want to run async task
+  ; (create-amqp-conn amqp-endpoint)
   (doto (express)
     (.use (.static express "resources/public"))
     (.use (morgan "dev"))

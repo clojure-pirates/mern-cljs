@@ -2,7 +2,8 @@
   (:require-macros
     [mern-utils.macros :refer [node-require, node-config defroute]])
   (:require
-    [cljs.nodejs :as nodejs]))
+    [cljs.nodejs :as nodejs]
+    [mern-utils.amqp :refer [send-to-queue amqp-state]]))
 
 (defonce route-table (atom []))  ; defroute macro needs this
 (node-require express "express")
@@ -49,3 +50,10 @@
                        (.status 200)
                        (.json (clj->js {:message "OK" :sessionID (.-sessionID req)}))))))))))
      req res)))
+
+(defroute task-handler "get" "/task"
+  ; This is for showing how to trigger a async task
+  (do (send-to-queue (:channel @amqp-state) (:default-queue @amqp-state) "hello")
+      (-> res
+        (.status 200)
+        (.json (clj->js {:message "OK"})))))
