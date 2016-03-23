@@ -15,12 +15,12 @@ and I don't intend to release a library or framework :)
 2. MongoDB
 3. Leiningen
 
-# How to run locally
+## How to run locally
 
 Run MongoDB
 
 ```
-sudo mongod 
+brew services start mongodb
 ```
 
 Run the example API server
@@ -42,11 +42,11 @@ lein run
 Point the browser to `http://localhost:1337/profile`
 (API server is served on port 5000 by default.)
 
-# Configuration
+## Configuration
 
 See example/common/src/common/config.cljs 
 
-# About API Authentication process
+## About API Authentication process
 
 Frontend app tries to fetch `me` resource. If it fails, it will redirect to
 Social auth. WWW backend authenticates via Passport.js and write information
@@ -54,15 +54,23 @@ on MongoDB with a one time API token. Token is passed on to the frontend and
 it is used to API auth. In the example app, it will be redirected to profile
 page to fetch `me` resource with proper authentication.
 
-# Issues
+## Async tasks
+
+```
+brew install rabbitmq
+brew services start rabbitmq
+```
+http://localhost:15672/
+
+## Issues
 
 - Google Auth requires consent everytime the page reloads
 
-# TODOs
+## TODOs
 
 - Time-expire API token :D (It is a non-time-expering one time token)
 - Add Twitter auth
 
-# References
+## References
 
-[Easy Node Authentication: Setup and Local | Scotch](https://scotch.io/tutorials/easy-node-authentication-setup-and-local)
+- [Easy Node Authentication: Setup and Local | Scotch](https://scotch.io/tutorials/easy-node-authentication-setup-and-local)
