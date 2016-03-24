@@ -2,10 +2,21 @@
   (:require-macros
     [mern-utils.macros :refer [node-require]])
   (:require 
+    [clojure.string :as string]
+    [cognitect.transit :as transit]
     [cljs.nodejs :as nodejs]))
 
 (node-require amqp "amqplib")
 (node-require node-when "when")
+
+(defn serialize [data]
+  (let [w (transit/writer :json-verbose)]
+    (transit/write w (clj->js data))))
+
+(defn deserialize [string]
+  (let [r (transit/reader :json)
+        input (string/replace (string/replace string  #"\"([^\"]*)\":" #"\"~:$1\":") #"[/\\]" "")]
+    (transit/read r input)))
 
 (defn default-msg-handler [msg]
   (println (str " [x] Received " msg)))
@@ -16,6 +27,9 @@
   (.sendToQueue channel queue (js/Buffer. msg) (clj->js {:deliveryMode true}))
   (println " [x] Sent" msg))
 ;        (.close ch))))))
+
+(defn queue-task [channel queue task]
+  (send-to-queue channel queue (serialize task)))
 
 (defn assert-queue [channel queue is-durable]
   (.assertQueue channel (:default-queue @amqp-state) (clj->js {:durable is-durable})))

@@ -2,7 +2,18 @@
   (:require-macros
     [mern-utils.macros :refer [node-require]])
   (:require
+    [clojure.string :as str]
     [cljs.nodejs :as nodejs]))
+
+; http://stackoverflow.com/questions/23345663/call-a-clojurescript-function-by-string-name/30892955#30892955
+(defn ->js [var-name]
+  (-> var-name
+    (str/replace #"/" ".")
+    (str/replace #"-" "_")))
+
+(defn resolve-str [function-name & args]
+  (let [fun (js/eval (->js function-name))]
+    (apply fun args)))
 
 (node-require os "os")
 (defonce local-ip

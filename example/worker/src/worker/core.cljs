@@ -4,8 +4,9 @@
   (:require
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
-    [mern-utils.amqp :refer [start-worker]]
-    [mern-utils.lib :refer [local-ip]]
+    [clojure.string :as str]
+    [mern-utils.amqp :refer [start-worker deserialize]]
+    [mern-utils.lib :refer [local-ip resolve-str]]
     [common.config :refer [RABBITMQ-DOMAIN RABBITMQ-PORT]]))
 
 (enable-console-print!)
@@ -15,11 +16,14 @@
 
 (def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
 
-(defn message-handler [msg]
-  (println " [x] Received message" msg))
+(defn ^:export log [data]
+  (println "[info]" (:message data)))
+ 
+(defn task-handler [string]
+  (let [task (deserialize string)]
+    (resolve-str (str "worker.core/" (:fn task)) (:data task))))
 
 (defn -main [& mess]
-;  (-> mongoose (.connect mongodb-endpoint))
-  (start-worker amqp-endpoint message-handler #(println (str "Worker running at http://" local-ip))))
+  (start-worker amqp-endpoint task-handler #(println (str "Worker running at http://" local-ip))))
 
 (set! *main-cli-fn* -main)
