@@ -36,7 +36,7 @@
 
 (defn server [success]
   ; Activate the next line if you want to run async task
-  (create-amqp-conn amqp-endpoint)
+  ; (create-amqp-conn amqp-endpoint)
   (doto (express)
     (.use (.static express "resources/public"))
     (.use (morgan "dev"))

@@ -3,6 +3,7 @@
     [mern-utils.macros :refer [node-require]])
   (:require
     [clojure.string :as str]
+    [cognitect.transit :as transit]
     [cljs.nodejs :as nodejs]))
 
 ; http://stackoverflow.com/questions/23345663/call-a-clojurescript-function-by-string-name/30892955#30892955
@@ -11,9 +12,19 @@
     (str/replace #"/" ".")
     (str/replace #"-" "_")))
 
-(defn resolve-str [function-name & args]
+; http://stackoverflow.com/questions/23345663/call-a-clojurescript-function-by-string-name/30892955#30892955
+(defn resolve-cljs [function-name & args]
   (let [fun (js/eval (->js function-name))]
     (apply fun args)))
+
+(defn serialize [data]
+  (let [w (transit/writer :json-verbose)]
+    (transit/write w (clj->js data))))
+
+(defn deserialize [string]
+  (let [r (transit/reader :json)
+        input (str/replace (str/replace string  #"\"([^\"]*)\":" #"\"~:$1\":") #"[/\\]" "")]
+    (transit/read r input)))
 
 (node-require os "os")
 (defonce local-ip

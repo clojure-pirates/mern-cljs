@@ -5,8 +5,8 @@
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
     [clojure.string :as str]
-    [mern-utils.amqp :refer [start-worker deserialize]]
-    [mern-utils.lib :refer [local-ip resolve-str]]
+    [mern-utils.amqp :refer [start-worker]]
+    [mern-utils.lib :refer [local-ip deserialize resolve-cljs]]
     [common.config :refer [RABBITMQ-DOMAIN RABBITMQ-PORT]]))
 
 (enable-console-print!)
@@ -17,11 +17,11 @@
 (def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
 
 (defn ^:export log [data]
-  (println "[info]" (:message data)))
+  (println "[info] Received message:" (:message data)))
  
 (defn task-handler [string]
   (let [task (deserialize string)]
-    (resolve-str (str "worker.core/" (:fn task)) (:data task))))
+    (resolve-cljs (str "worker.core/" (:fn task)) (:data task))))
 
 (defn -main [& mess]
   (start-worker amqp-endpoint task-handler #(println (str "Worker running at http://" local-ip))))
