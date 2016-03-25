@@ -5,7 +5,8 @@
   (:require
     [cljs.nodejs :as nodejs]
     [clojure.string :as string]
-    [hasch.core :as hasch]))
+    [hasch.core :as hasch]
+    [mern-utils.lib :refer [str->hex]]))
 
 (node-require passport-local "passport-local")
 (def local-strategy (.-Strategy passport-local))
@@ -15,11 +16,6 @@
 
 (node-require passport-google "passport-google-oauth")
 (def google-strategy (.-OAuth2Strategy passport-google))
-
-(defn str->hex
-  ; http://stackoverflow.com/questions/10062967/clojures-equivalent-to-pythons-encodehex-and-decodehex
-  [s]
-  (apply str (map #(.toString (int %) 16) s)))
 
 (defn add-uid [user salt]
   (if (not (.. user -uid))

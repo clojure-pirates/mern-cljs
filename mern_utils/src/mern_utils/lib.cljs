@@ -6,6 +6,10 @@
     [cognitect.transit :as transit]
     [cljs.nodejs :as nodejs]))
 
+; http://stackoverflow.com/questions/10062967/clojures-equivalent-to-pythons-encodehex-and-decodehex
+(defn str->hex [s]
+  (apply str (map #(.toString (int %) 16) s)))
+
 ; http://stackoverflow.com/questions/23345663/call-a-clojurescript-function-by-string-name/30892955#30892955
 (defn ->js [var-name]
   (-> var-name
