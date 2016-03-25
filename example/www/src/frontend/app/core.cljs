@@ -12,42 +12,53 @@
 
 (enable-console-print!)
 
-(def LOGIN (str "http://" API-DOMAIN ":" API-PORT "/login"))
-(def ME (str "http://" API-DOMAIN ":" API-PORT "/me"))
+(def API-ENDPOINT (str "http://" API-DOMAIN ":" API-PORT))
+(def LOGIN (str API-ENDPOINT "/login"))
+(def ME (str API-ENDPOINT "/me"))
 
-(defn login [uid token callback]
-  (post-json
-    LOGIN
-    {:uid uid :token token}
-    callback
-    (fn [res] println "Login error:" res)))
+(defn show-flash [message]
+  (swap! app-state assoc
+         :flash message
+         :flash-shown true))
 
-(defn refresh-profile [res]
+(defn do-login [uid token then error]
+  (post-json LOGIN {:uid uid :token token} then error))
+
+(defn login
+  "Fetch uid and token and login. Redirect to social auth if fails"
+  [then]
   (let [uid (.-userUID (js* "window"))
         token (.-shortTermToken (js* "window"))
         auth-strategy PRIMARY-SOCIAL-AUTH]
-    (if (or (= 0 (:status res)) (= 500 (:status res)))
-      (swap! app-state assoc
-             :flash "Oops, a network problem..."
-             :flash-shown true)
-      (if (= 404 (:status res))
-        (if (and (< 0 (count uid)) (< 0 (count token)))
-          (login uid token
-                 (fn [res]
-                   (if (= "OK" (:message res))
-                     (get-json ME refresh-profile refresh-profile)
-                     (redirect "/error"))))
-          (redirect (str "/auth/" auth-strategy "?next=profile")))
-        (swap! app-state assoc
-               :user (:user res)
-               :flash ""
-               :flash-shown false
-               :profile-loading-shown false
-               :profile-shown true
-               :profile-greetings "You are awesome, ")))))
+    (if (and (< 0 (count uid)) (< 0 (count token)))
+      (do-login uid token then (fn [res] (show-flash "Login error.")))
+      (redirect (str "/auth/" auth-strategy "?next=profile")))))
+
+(defn get-me [then]
+  (get-json
+    ME
+    (fn [res]
+      (case (:status res)
+        (0 500) (show-flash "The API server is down...")
+        404 (show-flash "Failed to fetch your information.")
+        (then res)))
+    (fn [res] (show-flash "Oops, something went wrong while fetching info..."))))
+
+(defn refresh-profile [res]
+  (swap! app-state assoc
+         :user (:user res)
+         :flash ""
+         :flash-shown false
+         :profile-loading-shown false
+         :profile-shown true
+         :profile-greetings "You are awesome, "))
 
 (defn profile [target-elem]
-  (get-json ME refresh-profile refresh-profile)
+  (login
+    (fn [res]
+      (if (= "OK" (:message res))
+        (get-me refresh-profile)
+        (show-flash "Oops, something went wrong..."))))
   (reagent/render [#(profile-view @app-state)] target-elem))
 
 (defn route [path target-elem]
