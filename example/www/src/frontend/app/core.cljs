@@ -7,7 +7,9 @@
     [common.config :refer [API-DOMAIN API-PORT PRIMARY-SOCIAL-AUTH]]
     [reagent.core :as reagent]
     [app.atom :refer [app-state]]
-    [app.utils :refer [get-json post-json get-path get-url-params get-elems-by-tag-name redirect]]
+    [mern-utils.frontend-lib :refer [get-js-var get-json post-json get-path
+                                     get-url-params get-elems-by-tag-name
+                                     redirect]]
     [app.views :refer [profile-view]]))
 
 (enable-console-print!)
@@ -26,13 +28,13 @@
 
 (defn login
   "Fetch uid and token and login. Redirect to social auth if fails"
-  [then]
-  (let [uid (.-userUID (js* "window"))
-        token (.-shortTermToken (js* "window"))
+  [then redir]
+  (let [uid (get-js-var "userUID")
+        token (get-js-var "shortTermToken")
         auth-strategy PRIMARY-SOCIAL-AUTH]
     (if (and (< 0 (count uid)) (< 0 (count token)))
       (do-login uid token then (fn [res] (show-flash "Login error.")))
-      (redirect (str "/auth/" auth-strategy "?next=profile")))))
+      (redirect (str "/auth/" auth-strategy "?next=" redir)))))
 
 (defn get-me [then]
   (get-json
@@ -58,7 +60,8 @@
     (fn [res]
       (if (= "OK" (:message res))
         (get-me refresh-profile)
-        (show-flash "Oops, something went wrong..."))))
+        (show-flash "Oops, something went wrong...")))
+    "profile")
   (reagent/render [#(profile-view @app-state)] target-elem))
 
 (defn route [path target-elem]

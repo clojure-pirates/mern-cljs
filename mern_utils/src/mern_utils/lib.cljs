@@ -56,9 +56,9 @@
   {:uid (if (.-user req) (.. req -user -uid) "")
    :token (if (.-user req) (.. req -user -api -token) "")})
 
+; from http://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
 (node-require os "os")
 (defonce local-ip
-  ; from http://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
   (let [iface-groups (.networkInterfaces os)
         ifnames (into [] (.keys js/Object iface-groups))]
     (loop [ifnames ifnames]
