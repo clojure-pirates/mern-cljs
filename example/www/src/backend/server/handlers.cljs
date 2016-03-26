@@ -6,6 +6,8 @@
     [clojure.string :as string]
     [cognitect.transit :as transit]
     [cemerick.url :refer (url url-encode)]
+    [mern-utils.lib :refer [set-next-url-from-param get-uid-token-from-request
+                            get-js-to-def-vars]]
     [mern-utils.express :refer [render]]
     [mern-utils.view :refer [render-page]]
     [server.views :refer [home-view login-view profile-view]]))
@@ -13,15 +15,6 @@
 (defonce route-table (atom []))  ; defroute macro needs this
 (node-require express "express")
 (node-require passport "passport")
-
-(defn write-js-string [x]
-  (let [w (transit/writer :json-verbose)]
-    (transit/write w x)))
-
-(defn set-next-url-from-param [req fallback]
-  (set!
-    (.. req -session -nextUrl)
-    (str "/" (or (:next (clojure.walk/keywordize-keys (:query (url (.-originalUrl req))))) fallback))))
 
 (defroute homepage-handler "get" "/"
   (let [data {:title "MERN-Cljs demo" :content (home-view)}]
@@ -58,9 +51,11 @@
                      (.redirect res "/login"))))))
 
 (defroute profile-handler "get" "/profile"
-  (let [uid   (if (.-user req) (.. req -user -uid) "")
-        token (if (.-user req) (.. req -user -api -token) "")
+  (let [cred (get-uid-token-from-request req)
+        js-root-vars ["userUID" (:uid cred)
+                      "shortTermToken" (:token cred)]
+        script (get-js-to-def-vars js-root-vars)
         data {:title "MERN-Cljs demo - Profile"
               :content (profile-view)
-              :scripts [(str "var userUID ='" uid "', shortTermToken = '" token "';")] }]
+              :scripts [script] }]
     (render req res (render-page data))))
