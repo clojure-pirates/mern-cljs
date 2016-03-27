@@ -41,7 +41,7 @@
   "Take a list of key value string pairs and produce a JavaScript"
   [key-values]
   (let [pairs (into [] (partition 2 key-values))
-        raw (apply str (map #(str (first %) "='" (second %) "',") pairs))]
+        raw (apply str (map #(str (first %) "='" (str/replace (second %) #"'" #"\'") "',") pairs))]
     (str "var " (subs raw 0 (dec (count raw))) ";")))
 
 (defn set-next-url-from-param
