@@ -18,8 +18,8 @@
 (def google-strategy (.-OAuth2Strategy passport-google))
 
 (defn add-uid [user salt]
-  (if (not (.. user -uid))
-    (set! (.. user -uid) (str->hex (str (hasch/uuid salt)))))
+  (if (not (.-uid user))
+    (set! (.-uid user) (str->hex (str (hasch/uuid salt)))))
   user)
 
 (defn give-api-token

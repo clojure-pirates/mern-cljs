@@ -44,11 +44,14 @@
         raw (apply str (map #(str (first %) "='" (str/replace (second %) #"'" #"\'") "',") pairs))]
     (str "var " (subs raw 0 (dec (count raw))) ";")))
 
+(defn get-url-params [req]
+  (keywordize-keys (:query (url (.-originalUrl req)))))
+
 (defn set-next-url-from-param
   "Convenience funciton for backend handlers to set next url after auth in session"
   [req fallback]
-  (let [query (keywordize-keys (:query (url (.-originalUrl req))))]
-    (set! (.. req -session -nextUrl) (str "/" (or (:next query) fallback)))))
+  (let [params (get-url-params req)]
+    (set! (.. req -session -nextUrl) (str "/" (or (:next params) fallback)))))
 
 (defn get-uid-token-from-request
   "Convenience function for backend handlers to get user uid and token for auth"
