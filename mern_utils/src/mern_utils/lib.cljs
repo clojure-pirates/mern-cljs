@@ -34,7 +34,13 @@
 (defn deserialize [string]
   "Deserialize json into cljs map"
   (let [r (transit/reader :json)
-        input (str/replace (str/replace string  #"\"([^\"]*)\":" #"\"~:$1\":") #"[/\\]" "")]
+        input (-> string
+                  (str/replace #"\"([^\"]*)\":" #"\"~:$1\":")
+                  (str/replace #"/\\" "")
+                  (str/replace "\\\":" "\":")
+                  (str/replace "/\"" "\"")
+                  (str/replace "/'/" "'")
+                  (str/replace "/{" "{"))]
     (transit/read r input)))
 
 (defn get-js-to-def-vars
@@ -53,11 +59,20 @@
   (let [params (get-url-params req)]
     (set! (.. req -session -nextUrl) (str "/" (or (:next params) fallback)))))
 
-(defn get-uid-token-from-request
+(defn get-uid-token
   "Convenience function for backend handlers to get user uid and token for auth"
-  [req]
-  {:uid (if (.-user req) (.. req -user -uid) "")
-   :token (if (.-user req) (.. req -user -api -token) "")})
+  [req res]
+  (if (.-user req)
+    (let [uid (.. req -user -uid)
+          token (.. req -user -api -token)]
+      (.cookie res "userUid" uid)
+      (.cookie res "apiToken" token)
+      {:uid uid :token token})
+  (let [uid (.. req -cookies -userUid)
+        token (.. req -cookies -apiToken)]
+    (if (and uid token)
+      {:uid uid :token token}
+      {:uid "" :token ""}))))
 
 ; from http://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
 (node-require os "os")

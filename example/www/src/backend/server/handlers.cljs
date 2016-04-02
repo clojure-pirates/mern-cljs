@@ -51,7 +51,7 @@
                      (.redirect res "/login"))))))
 
 (defroute profile-handler "get" "/profile"
-  (let [cred (get-uid-token-from-request req)
+  (let [cred (get-uid-token req res)
         js-root-vars ["userUID" (:uid cred)
                       "shortTermToken" (:token cred)]
         script (get-js-to-def-vars js-root-vars)

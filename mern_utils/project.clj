@@ -14,12 +14,13 @@
                  [com.cemerick/url "0.1.1"]
                  [cljs-ajax "0.5.3"]]
 
-  :npm {:dependencies [[express "4.13.3"]
-                       [xmlhttprequest "*"]
-                       [xmldom "0.1.19"]
-                       [source-map-support "*"]
+  :npm {:dependencies [[express "4.13.4"]
+                       [xmlhttprequest "1.8.0"]
+                       [xmldom "0.1.22"]
+                       [source-map-support "0.4.0"]
                        [react "0.13.3"]
-                       [express-session "~1.0.0"]]
+                       [express-session "1.13.0"]
+                       ]
         :root :root}
 
   :plugins [[lein-cljsbuild "1.1.0"]
