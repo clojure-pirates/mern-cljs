@@ -10,6 +10,7 @@
                  [reagent "0.5.1"]
                  [kioo "0.4.1"]
                  ; Added by Daigo
+                 [com.andrewmcveigh/cljs-time "0.4.0"]
                  [com.cognitect/transit-cljs "0.8.220"]
                  [com.cemerick/piggieback "0.2.1"]
                  [com.cemerick/url "0.1.1"]

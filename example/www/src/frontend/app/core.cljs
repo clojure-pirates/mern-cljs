@@ -2,6 +2,7 @@
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]])
   (:require
+    [clojure.string :as string]
     [cljs.core.async :as async :refer [chan close! timeout put!]]
     [goog.events :as events]
     [common.config :refer [API-DOMAIN API-PORT PRIMARY-SOCIAL-AUTH]]
@@ -20,21 +21,24 @@
 
 (defn show-flash [message]
   (swap! app-state assoc
-         :flash message
+         :flash-message message
          :flash-shown true))
+
+(defn redirect-to-login [next-]
+  (redirect (str "/login/?next=" next-)))
 
 (defn do-login [uid token then error]
   (post-json LOGIN {:uid uid :token token} then error))
 
 (defn login
   "Fetch uid and token and login. Redirect to social auth if fails"
-  [then redir]
+  [then next- error]
   (let [uid (get-js-var "userUID")
-        token (get-js-var "shortTermToken")
-        auth-strategy PRIMARY-SOCIAL-AUTH]
+        token (get-js-var "shortTermToken")]
     (if (and (< 0 (count uid)) (< 0 (count token)))
-      (do-login uid token then (fn [res] (show-flash "Login error.")))
-      (redirect (str "/auth/" auth-strategy "?next=" redir)))))
+      (do-login uid token then (fn [res] (error)))
+      (do (println "uid and token are not defined. Redirecting to social auth...")
+          (redirect-to-login next-)))))
 
 (defn get-me [then]
   (get-json
@@ -46,28 +50,31 @@
         (then res)))
     (fn [res] (show-flash "Oops, something went wrong while fetching info..."))))
 
-(defn refresh-profile [res]
+(defn refresh-profile [user]
   (swap! app-state assoc
-         :user (:user res)
+         :user user
+         :profile-greetings "You are awesome,"
          :flash ""
          :flash-shown false
+         :profile-greetings-shown true
          :profile-loading-shown false
-         :profile-shown true
-         :profile-greetings "You are awesome, "))
+         :profile-pic-shown true))
 
 (defn profile [target-elem]
   (login
     (fn [res]
       (if (= "OK" (:message res))
-        (get-me refresh-profile)
+        (get-me (fn [res] (refresh-profile (:user res))))
         (show-flash "Oops, something went wrong...")))
-    "profile")
+    "profile"
+    (fn [res] (redirect-to-login "profile")))
   (reagent/render [#(profile-view @app-state)] target-elem))
 
 (defn route [path target-elem]
-  (case path
-    "/profile" (profile target-elem)
-    (println "No handler defined for path: " path)))
+  (let [page (second (string/split path "/"))]
+    (case page
+      "profile" (profile target-elem)
+      (println "No handler defined for path: " path))))
 
 (defn activate []
   (let [elem (first (get-elems-by-tag-name "content"))

@@ -12,15 +12,23 @@
   (do-> (remove-class "show" "hide")
         (add-class (if is-visible "show" "hide"))))
 
-(defsnippet login-view "public/login.html" [:#content]
+(defsnippet login-view "public/login.html" [:#container]
   [data]
   {})
 
-(defsnippet profile-view "public/profile.html" [:#content]
+(defsnippet header "public/page.html" [:#header :> :div]
   [data]
-  {[:#flash] (do-> (content (:flash data)) (set-visibility (:flash-shown data)))
-   [:#profile-loading] (set-visibility (:profile-loading-shown data))
-   [:#profile] (set-visibility (:profile-shown data))
-   [:#greetings] (content (:profile-greetings data))
+  {[:#greetings] (content (:profile-greetings data))
    [:#user-fullname] (content (get-in data [:user :name]))
-   [:#profile-pic] (set-attr :src (get-in data [:user :photo]))})
+   [:#profile-greetings] (set-visibility (:profile-greetings-shown data))
+   [:#profile-loading] (set-visibility (:profile-loading-shown data))
+   [:#profile-pic] (do-> (set-attr :src (get-in data [:user :photo])) (set-visibility (:profile-pic-shown data)))})
+
+(defsnippet flash "public/page.html" [:#flash :> :div]
+  [data]
+  {[:#flash-message] (content (:flash-message data))})
+
+(defsnippet profile-view "public/page.html" [:#container]
+  [data]
+  {[:#header] (content (header data))
+   [:#flash]  (do-> (content (flash data)) (set-visibility (:flash-shown data)))})

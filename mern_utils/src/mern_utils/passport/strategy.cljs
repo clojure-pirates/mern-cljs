@@ -5,6 +5,8 @@
   (:require
     [cljs.nodejs :as nodejs]
     [clojure.string :as string]
+    [cljs-time.core :as time-core]
+    [cljs-time.coerce :as time-coerce]
     [hasch.core :as hasch]
     [mern-utils.lib :refer [str->hex]]))
 
@@ -25,22 +27,22 @@
 (defn give-api-token
   [user]
   ; This function does NOT commit the change to the database
-  ; TODO: Set tokenExpiresAt
   (set! (.. user -api -token) (str->hex (str (hasch/uuid)))) ; uuid4
+  (set! (.. user -api -tokenExpiresAt) (+ (* 1000 60 60 24 365) (time-coerce/to-long (time-core/now))))
   user)
 
 (defn get-api-token [user]
   (.. user -api -token))
 
 (defn validate-api-token
-  ; If token is valid for the user, remove token and return true
-  ; TODO: Check tokenExpiresAt
+  "Returns true if token is valid for the user"
   [user token]
-  (if (and (not-empty (.. user -api -token)) (= token (.. user -api -token)))
-    (do (set! (.. user -api -token) "")
-        (.save user (fn [err] (if err (js/throw err) true)))
-        true)
-    false))
+  (let [token (.. user -api -token)
+        expire-at (.. user -api -tokenExpiresAt)]
+    (if (< expire-at (time-coerce/to-long (time-core/now)))
+      false
+      (if (and (not-empty (.. user -api -token)) (= token (.. user -api -token)))
+        true false))))
 
 (defn register-new-user [strategy user-model email-domain-restriction token profile done]
   (if (and email-domain-restriction

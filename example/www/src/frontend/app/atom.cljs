@@ -4,11 +4,13 @@
 
 (defonce app-state
   (reagent/atom
-    {:flash ""
+    {:url-params {}
      :flash-shown false
+     :flash-message ""
+     :profile-greetings-shown false
      :profile-loading-shown true
-     :profile-shown false
+     :profile-pic-shown false
      :profile-greetings "Hello"
-     :user {:name "" :photo "image/facebook-profile-picture.jpg"}
-     :image-url "/image/loading.gif"
-     :url-params {}}))
+     :user {:name "" :photo "/image/facebook-profile-picture.jpg"}
+     :content-shown false
+     }))

@@ -54,10 +54,11 @@
   (keywordize-keys (:query (url (.-originalUrl req)))))
 
 (defn set-next-url-from-param
-  "Convenience funciton for backend handlers to set next url after auth in session"
-  [req fallback]
+  "Convenience funciton for backend handlers to set next url after auth in cookie"
+  [req res fallback]
   (let [params (get-url-params req)]
-    (set! (.. req -session -nextUrl) (str "/" (or (:next params) fallback)))))
+    (println (:next params))
+    (.cookie res "nextUrl" (str "/" (or (:next params) fallback)))))
 
 (defn get-uid-token
   "Convenience function for backend handlers to get user uid and token for auth"

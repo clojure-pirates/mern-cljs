@@ -37,9 +37,13 @@
        (clj->js {:session true})
        (fn [err user info]
          (if err
-           (println (str "user error: " err))
+           (-> res
+             (.status 401)
+             (.json (clj->js {:message "Login error"})))
            (if (not user)
-             (println (str "user not found error: " info))
+             (-> res
+                 (.status 401)
+                 (.json (clj->js {:message "Authentication error"})))
              (.logIn
                req
                user

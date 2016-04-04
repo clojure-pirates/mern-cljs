@@ -8,6 +8,7 @@
                  [org.clojure/clojurescript "1.7.48"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
                  ; Added by Daigo
+                 [com.andrewmcveigh/cljs-time "0.4.0"]
                  [com.cognitect/transit-cljs "0.8.220"]
                  [com.cemerick/piggieback "0.2.1"]
                  [com.cemerick/url "0.1.1"]

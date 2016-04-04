@@ -27,6 +27,9 @@
 
 (def PRIMARY-SOCIAL-AUTH "facebook")
 
+; 0: Expire after once time use. -1: never expires. n > 0: Expires in n sec
+(def API-TOKEN-EXPIRES-IN -1)
+
 ; Those social app accounts are set up for the example app
 (def FACEBOOK-CLIENT-ID     "825920487534725")
 (def FACEBOOK-CLIENT-SECRET "93bf4835a0b66422e49a480c7be711c5")
