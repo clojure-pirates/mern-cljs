@@ -19,7 +19,9 @@
                    (do (-> ~'user (~'give-api-token)
                                 (.save (fn [~'err] (if ~'err (js/throw ~'err) true))))
                        (~'done nil ~'user))
-                   (~'register-new-user ~strategy ~user-model (:email-domain-restriction ~config-auth) ~'token ~'profile ~'done))))))))
+                   (~'register-new-user ~strategy ~user-model
+                                        (:email-domain-restriction ~config-auth)
+                                        ~'token ~'profile ~'done))))))))
      (if (get-in ~config-auth [(keyword (str ~strategy "-auth")) :client-id])
        (do
          (.use

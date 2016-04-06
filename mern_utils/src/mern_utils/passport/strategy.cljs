@@ -28,7 +28,7 @@
   [user]
   ; This function does NOT commit the change to the database
   (set! (.. user -api -token) (str->hex (str (hasch/uuid)))) ; uuid4
-  (set! (.. user -api -tokenExpiresAt) (+ (* 1000 60 60 24 365) (time-coerce/to-long (time-core/now))))
+  (set! (.. user -api -tokenCreatedAt) (time-coerce/to-long (time-core/now)))
   user)
 
 (defn get-api-token [user]
@@ -36,15 +36,16 @@
 
 (defn validate-api-token
   "Returns true if token is valid for the user"
-  [user token]
+  [user token token-expires-in-sec]
   (let [token (.. user -api -token)
-        expire-at (.. user -api -tokenExpiresAt)]
+        expire-at (+ (* 1000 token-expires-in-sec) (.. user -api -tokenCreatedAt))]
     (if (< expire-at (time-coerce/to-long (time-core/now)))
       false
       (if (and (not-empty (.. user -api -token)) (= token (.. user -api -token)))
         true false))))
 
-(defn register-new-user [strategy user-model email-domain-restriction token profile done]
+(defn register-new-user [strategy user-model email-domain-restriction token
+                         profile done]
   (if (and email-domain-restriction
            (or (= (.-emails profile) js/undefined)
                (not= email-domain-restriction
@@ -123,7 +124,7 @@
               (done err)
               ; if no user is found, return the message
               (if user
-                (if (validate-api-token user token)
+                (if (validate-api-token user token (:token-expires-in-sec config-auth))
                   ; all is well, return successful user
                   (done nil user)
                   ; create the loginMessage and save it to session as flashdata

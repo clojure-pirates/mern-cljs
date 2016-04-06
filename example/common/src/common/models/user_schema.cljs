@@ -13,7 +13,7 @@
     mongoose
     (clj->js
       {:uid js/String
-       :api {:token js/String :tokenExpiresAt js/Number}
+       :api {:token js/String :tokenCreatedAt js/Number}
        :email js/String
        :name js/String
        :photo js/String
