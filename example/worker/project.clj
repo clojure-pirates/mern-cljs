@@ -15,8 +15,8 @@
                  [net.polyc0l0r/hasch "0.2.3"]
                  ]
 
-  :npm {:dependencies [[xmlhttprequest "*"]
-                       [source-map-support "*"]
+  :npm {:dependencies [[xmlhttprequest "1.8.0"]
+                       [source-map-support "0.4.0"]
                        ; Added by Daigo
                        [mongoose "latest"]
                        [amqplib "latest"]
