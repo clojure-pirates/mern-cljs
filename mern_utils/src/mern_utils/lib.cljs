@@ -12,7 +12,7 @@
 (defn str->hex
   "Encode numbers into hex string"
   [s]
-  (apply str (map #(.toString (int %) 16) s)))
+  (apply str (map #(.toString (js/Number (int %)) 16) s)))
 
 (defn ->js [var-name]
   (-> var-name

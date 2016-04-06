@@ -7,8 +7,7 @@
     [clojure.string :as string]
     [cljs-time.core :as time-core]
     [cljs-time.coerce :as time-coerce]
-    [hasch.core :as hasch]
-    [mern-utils.lib :refer [str->hex]]))
+    [hasch.core :as hasch]))
 
 (node-require passport-local "passport-local")
 (def local-strategy (.-Strategy passport-local))
@@ -21,13 +20,13 @@
 
 (defn add-uid [user salt]
   (if (not (.-uid user))
-    (set! (.-uid user) (str->hex (str (hasch/uuid salt)))))
+    (set! (.-uid user) (string/replace (str (hasch/uuid salt)) "-" "")))
   user)
 
 (defn give-api-token
   [user]
   ; This function does NOT commit the change to the database
-  (set! (.. user -api -token) (str->hex (str (hasch/uuid)))) ; uuid4
+  (set! (.. user -api -token) (string/replace (str (hasch/uuid)) "-" "")) ; uuid4
   (set! (.. user -api -tokenCreatedAt) (time-coerce/to-long (time-core/now)))
   user)
 
