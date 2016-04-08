@@ -3,9 +3,9 @@
     [mern-utils.macros :refer [node-require]])
   (:require 
     [cljs.nodejs :as nodejs]
-    [common.models.user-schema :refer [userSchema]]))
-
-(node-require mongoose "mongoose")
+    [mern-utils.mongoose :as db]
+    [common.models.user-schema :refer [userSchema]]
+    ))
 
 ; create the model for users and expose it to our app
-(def user (.model mongoose "User" userSchema))
+(def user (db/model "User" userSchema))

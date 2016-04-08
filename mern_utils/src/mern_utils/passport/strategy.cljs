@@ -7,7 +7,8 @@
     [clojure.string :as string]
     [cljs-time.core :as time-core]
     [cljs-time.coerce :as time-coerce]
-    [hasch.core :as hasch]))
+    [hasch.core :as hasch]
+    [mern-utils.mongoose :as db]))
 
 (node-require passport-local "passport-local")
 (def local-strategy (.-Strategy passport-local))
@@ -18,15 +19,17 @@
 (node-require passport-google "passport-google-oauth")
 (def google-strategy (.-OAuth2Strategy passport-google))
 
-(defn add-uid [user salt]
-  (if (not (.-uid user))
-    (set! (.-uid user) (string/replace (str (hasch/uuid salt)) "-" "")))
+(defn uuid4-hex []
+  (string/replace (str (hasch/uuid)) "-" ""))
+
+(defn add-uid [user]
+  (if (not (.-uid user)) (set! (.-uid user) (uuid4-hex)))
   user)
 
 (defn give-api-token
   [user]
   ; This function does NOT commit the change to the database
-  (set! (.. user -api -token) (string/replace (str (hasch/uuid)) "-" "")) ; uuid4
+  (set! (.. user -api -token) (uuid4-hex))
   (set! (.. user -api -tokenCreatedAt) (time-coerce/to-long (time-core/now)))
   user)
 
@@ -50,7 +53,7 @@
                (not= email-domain-restriction
                      (last (string/split (.-value (first (.-emails profile))) #"@")))))
     (done (str "Registration only allowed for " email-domain-restriction) nil)
-    (let [new-user (new user-model)
+    (let [new-user (db/create user-model)
           strategy-type (symbol (str "-" strategy))]
       (aset new-user strategy "id" (.-id profile))
       (aset new-user strategy "token" token)
@@ -71,9 +74,7 @@
         (do (aset new-user strategy "photo" (.-value (first (.-photos profile))))
             (aset new-user "photo" (.-value (first (.-photos profile))))))
 
-      (-> new-user
-          (give-api-token)
-          (add-uid (get-api-token new-user))) ; use token as salt for uuid5
+      (-> new-user (give-api-token) (add-uid))
 
       (.save new-user
         (fn [err]
@@ -94,7 +95,7 @@
   ; used to deserialize the user
   (.deserializeUser
     passport
-    (fn [id done] (.findById user-model id (fn [err user] (done err user)))))
+    (fn [id done] (db/get-by-id user-model id (fn [err user] (done err user)))))
 
   ; =========================================================================
   ; API LOGIN =============================================================
@@ -114,9 +115,9 @@
       (fn [req uid token done]
         ; find a user whose email is the same as the forms email
         ; we are checking to see if the user trying to login already exists
-        (.findOne
+        (db/get-one
           user-model
-          (clj->js {:uid uid})
+          {:uid uid}
           (fn [err user]
             ; if there are any errors, return the error before anything else
             (if err

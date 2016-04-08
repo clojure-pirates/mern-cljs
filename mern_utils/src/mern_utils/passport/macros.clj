@@ -9,9 +9,9 @@
        (.nextTick
          nodejs/process
          (fn []
-           (.findOne
+           (db/get-one
              ~user-model
-             (~'clj->js {(keyword (str ~strategy ".id")) (.-id ~'profile)})
+             {(keyword (str ~strategy ".id")) (.-id ~'profile)}
              (fn [~'err ~'user]
                (if ~'err
                  (~'done ~'err)

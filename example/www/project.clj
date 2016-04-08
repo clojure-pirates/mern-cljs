@@ -66,7 +66,7 @@
                {:source-paths ["src/frontend"]
                 :compiler {:output-to "resources/public/js/out/app.js"
                            :output-dir "resources/public/js/out"
-                           :asset-path "js/out"
+                           :asset-path "/js/out"
                            :main app.start
                            :optimizations :none}}
 

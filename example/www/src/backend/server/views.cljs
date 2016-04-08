@@ -9,11 +9,11 @@
 
 ; Inject each view into content tag in template.html
 
-(defsnippet home-view "public/home.html" [:#content]
+(defsnippet home-view "public/home.html" [:#container]
   [] {})
 
-(defsnippet login-view "public/login.html" [:#content]
+(defsnippet login-view "public/login.html" [:#container]
   [] {})
 
-(defsnippet profile-view "public/profile.html" [:#content]
+(defsnippet profile-view "public/page.html" [:#container]
   [] {})
