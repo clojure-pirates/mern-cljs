@@ -12,6 +12,9 @@
 (def MONGODB-PORT 27017)
 (def MONGODB-DBNAME "merncljs_auth")
 
+(def DATABASE "mongodb")
+(def DB-ENDPOINT (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
+
 (def RABBITMQ-DOMAIN LOCAL-IP)
 (def RABBITMQ-PORT 5672)
 (def RABBITMQ-DEFAULT-QUEUE "task_queue")
@@ -27,7 +30,6 @@
 
 (def PRIMARY-SOCIAL-AUTH "facebook")
 
-; 0: Expire after once time use. -1: never expires. n > 0: Expires in n sec
 (def API-TOKEN-EXPIRES-IN (* 60 60 24 14)) ; 2 weeks
 
 ; Those social app accounts are set up for the example app

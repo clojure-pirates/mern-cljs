@@ -6,12 +6,12 @@
     [cljs.nodejs :as nodejs]
     [clojure.string :as str]
     [mern-utils.amqp :refer [start-worker]]
+    [mern-utils.db :as db]
     [mern-utils.lib :refer [local-ip deserialize resolve-cljs]]
-    [common.config :refer [RABBITMQ-DOMAIN RABBITMQ-PORT]]))
+    [common.config :refer [DATABASE DB-ENDPOINT RABBITMQ-DOMAIN RABBITMQ-PORT]]))
 
 (enable-console-print!)
 
-(node-require mongoose "mongoose")
 (node-require amqp "amqplib")
 
 (def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
@@ -24,6 +24,7 @@
     (resolve-cljs (str "worker.core/" (:fn task)) (:data task))))
 
 (defn -main [& mess]
+  (db/connect DATABASE DB-ENDPOINT)
   (start-worker amqp-endpoint task-handler #(println (str "Worker running at http://" local-ip))))
 
 (set! *main-cli-fn* -main)

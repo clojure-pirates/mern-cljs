@@ -1,4 +1,4 @@
-(ns mern_utils.mongoose
+(ns mern-utils.mongoose
   (:require-macros
     [mern-utils.macros :refer [node-require]])
   (:require

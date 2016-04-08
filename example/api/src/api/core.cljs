@@ -4,11 +4,12 @@
   (:require
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
+    [mern-utils.db :as db]
     [mern-utils.lib :refer [local-ip]]
     [mern-utils.amqp :refer [create-amqp-conn]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
-    [common.config :refer [MONGODB-DOMAIN MONGODB-PORT MONGODB-DBNAME
+    [common.config :refer [DATABASE DB-ENDPOINT
                            RABBITMQ-DOMAIN RABBITMQ-PORT
                            API-DOMAIN API-PORT
                            WWW-DOMAIN WWW-PORT
@@ -23,14 +24,11 @@
 
 (node-require express "express")
 (node-require express-session "express-session")
-(node-require mongoose "mongoose")
 (node-require passport "passport")
 (node-require connect-flash "connect-flash")
 (node-require morgan "morgan")
 (node-require body-parser "body-parser")
 (node-require cookie-parser "cookie-parser")
-
-(def mongodb-endpoint (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
 
 (def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
 
@@ -52,7 +50,7 @@
 )
 
 (defn -main [& mess]
-  (-> mongoose (.connect mongodb-endpoint))
+  (db/connect DATABASE DB-ENDPOINT)
   (config-passport passport config-auth user)
   (server #(println (str "Server running at http://" local-ip ":" API-PORT "/"))))
 

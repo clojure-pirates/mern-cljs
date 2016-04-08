@@ -4,10 +4,11 @@
   (:require
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
+    [mern-utils.db :as db]
     [mern-utils.lib :refer [local-ip]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
-    [common.config :refer [MONGODB-DOMAIN MONGODB-PORT MONGODB-DBNAME WWW-DOMAIN WWW-PORT config-auth cors-options]]
+    [common.config :refer [DATABASE DB-ENDPOINT WWW-DOMAIN WWW-PORT config-auth cors-options]]
     [common.models :refer [user]]
     [server.handlers :refer [route-table]]))
 
@@ -16,7 +17,6 @@
 (node-require express "express")
 (node-require express-session "express-session")
 (node-require cors "cors")
-(node-require mongoose "mongoose")
 (node-require passport "passport")
 (node-require connect-flash "connect-flash")
 (node-require morgan "morgan")
@@ -40,7 +40,7 @@
 )
 
 (defn -main [& mess]
-  (.connect mongoose (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
+  (db/connect DATABASE DB-ENDPOINT)
   (config-passport passport config-auth user)
   (server #(println (str "Server running at http://" local-ip ":" WWW-PORT "/"))))
 
