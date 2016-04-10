@@ -15,8 +15,8 @@
 (defn create [model]
   (new model))
 
-(defn get-by-id [model id then]
-  (.findById model id then))
-
 (defn get-one [model query then]
   (.findOne model (clj->js query) then))
+
+(defn get-by-id [model id then]
+  (.findById model id then))

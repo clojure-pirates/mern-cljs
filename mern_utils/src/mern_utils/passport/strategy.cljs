@@ -8,7 +8,8 @@
     [cljs-time.core :as time-core]
     [cljs-time.coerce :as time-coerce]
     [hasch.core :as hasch]
-    [mern-utils.mongoose :as db]))
+;    [mern-utils.mongoose :as db]))
+    [mern-utils.dynamoose :as db]))
 
 (node-require passport-local "passport-local")
 (def local-strategy (.-Strategy passport-local))
@@ -22,67 +23,93 @@
 (defn uuid4-hex []
   (string/replace (str (hasch/uuid)) "-" ""))
 
-(defn add-uid [user]
-  (if (not (.-uid user)) (set! (.-uid user) (uuid4-hex)))
-  user)
+(defn create-uid [] (uuid4-hex))
 
-(defn give-api-token
-  [user]
-  ; This function does NOT commit the change to the database
-  (set! (.. user -api -token) (uuid4-hex))
-  (set! (.. user -api -tokenCreatedAt) (time-coerce/to-long (time-core/now)))
-  user)
-
-(defn get-api-token [user]
-  (.. user -api -token))
+(defn create-api-token []
+  {:token (uuid4-hex) :created-at (time-coerce/to-long (time-core/now))})
 
 (defn validate-api-token
   "Returns true if token is valid for the user"
-  [user token token-expires-in-sec]
-  (let [token (.. user -api -token)
-        expire-at (+ (* 1000 token-expires-in-sec) (.. user -api -tokenCreatedAt))]
+  [api-token given-token token-expires-in-sec]
+  (println api-token given-token token-expires-in-sec)
+  (let [expire-at (+ (* 1000 token-expires-in-sec) (.-tokenCreatedAt api-token))]
     (if (< expire-at (time-coerce/to-long (time-core/now)))
       false
-      (if (and (not-empty (.. user -api -token)) (= token (.. user -api -token)))
+      (if (and (not-empty (.-token api-token)) (= given-token (.-token api-token)))
         true false))))
 
-(defn register-new-user [strategy user-model email-domain-restriction token
-                         profile done]
+(defn get-full-name [profile]
+  (if (not= (.. profile -name -givenName) js/undefined)
+    (str (.. profile -name -givenName) " " (.. profile -name -familyName))
+    (.. profile -name)))
+
+(defn get-email [profile]
+  (if (not= (.-emails profile) js/undefined)
+    (.-value (first (.-emails profile)))
+    nil))
+
+(defn get-photo [profile]
+  (if (not= (.-photos profile) js/undefined)
+    (.-value (first (.-photos profile)))
+    nil))
+
+(defn except [err]
+  (println err)
+  (throw (js/Error. err)))
+
+(defn upsert-record [model query data then]
+  (db/upsert model query data
+             (fn [err record] (if err (except err) (then record)))))
+
+(defn create-record [model data then]
+  (db/create model data
+             (fn [err record] (if err (except err) (then record)))))
+
+(defn refresh-api-token [api-token-model user-uid then]
+  (let [api-token (create-api-token)
+        data {:userUid user-uid
+              :token (:token api-token)
+              :tokenCreatedAt (:created-at api-token)}]
+  (db/upsert api-token-model {:userUid user-uid} data
+             (fn [err record] (if err (except err) (then record))))))
+
+(defn get-user-from-social-account-id [user-model social-account-model id then]
+  (db/get-by-id social-account-model id
+                (fn [err acct]
+                  (do (println "account" acct err) (db/get-one user-model {:uid (:userUid acct)} then)))))
+
+(defn register-new-user [strategy
+                         user-model api-token-model social-account-model
+                         email-domain-restriction token profile done]
   (if (and email-domain-restriction
            (or (= (.-emails profile) js/undefined)
                (not= email-domain-restriction
                      (last (string/split (.-value (first (.-emails profile))) #"@")))))
     (done (str "Registration only allowed for " email-domain-restriction) nil)
-    (let [new-user (db/create user-model)
-          strategy-type (symbol (str "-" strategy))]
-      (aset new-user strategy "id" (.-id profile))
-      (aset new-user strategy "token" token)
+    (let [full-name   (get-full-name profile)
+          email       (get-email profile)
+          photo       (get-photo profile)
+          user-data   {:uid (create-uid)
+                       :name full-name
+                       :email email
+                       :photo photo}
+          social-acct {:id (.-id profile)
+                       :userUid (:uid user-data)
+                       :token token
+                       :name full-name
+                       :email email
+                       :photo photo}]
+      (upsert-record
+        social-account-model {:id (:id social-acct)} social-acct
+        (fn [acct]
+          (refresh-api-token
+            api-token-model (:uid user-data)
+            (fn [api-token]
+              (create-record
+                user-model user-data
+                (fn [new-user] (done nil new-user))))))))))
 
-      ; facebook gives givenName+familyName and Google is just flat name
-      (if (not= (.. profile -name -givenName) js/undefined)
-        (aset new-user strategy "name"
-              (str (.. profile -name -givenName) " " (.. profile -name -familyName)))
-        (aset new-user strategy "name" (.. profile -name)))
-      ; Copy name
-      (aset new-user "name" (aget new-user strategy "name"))
-
-      (if (not= (.-emails profile) js/undefined)
-        (do (aset new-user strategy "email" (.-value (first (.-emails profile))))
-            (aset new-user "email" (.-value (first (.-emails profile))))))
-
-      (if (not= (.-photos profile) js/undefined)
-        (do (aset new-user strategy "photo" (.-value (first (.-photos profile))))
-            (aset new-user "photo" (.-value (first (.-photos profile))))))
-
-      (-> new-user (give-api-token) (add-uid))
-
-      (.save new-user
-        (fn [err]
-          (if err
-            (js/throw err)
-            (done nil new-user)))))))
-
-(defn config-passport [passport config-auth user-model]
+(defn config-passport [passport config-auth user-model api-token-model facebook-account-model google-account-model]
   ; =========================================================================
   ; passport session setup ==================================================
   ; =========================================================================
@@ -90,12 +117,18 @@
   ; passport needs ability to serialize and unserialize users out of session
 
   ; used to serialize the user for the session
-  (.serializeUser passport (fn [user done] (done nil (.-id user))))
+  (.serializeUser passport (fn [user done] (do (println "serializing..." user) (done nil (.-uid user)))))
 
   ; used to deserialize the user
   (.deserializeUser
     passport
-    (fn [id done] (db/get-by-id user-model id (fn [err user] (done err user)))))
+    (fn [id done]
+      (db/get-one user-model {:uid id}
+                  (fn [err user]
+                    (db/get-one api-token-model {:userUid id}
+                                (fn [err api-token]
+                                  (aset user "api" api-token)
+                                  (done err user)))))))
 
   ; =========================================================================
   ; API LOGIN =============================================================
@@ -116,21 +149,24 @@
         ; find a user whose email is the same as the forms email
         ; we are checking to see if the user trying to login already exists
         (db/get-one
-          user-model
-          {:uid uid}
+          user-model {:uid uid}
           (fn [err user]
             ; if there are any errors, return the error before anything else
-            (if err
+            (if (not (nil? err))
               (done err)
-              ; if no user is found, return the message
-              (if user
-                (if (validate-api-token user token (:token-expires-in-sec config-auth))
-                  ; all is well, return successful user
-                  (done nil user)
-                  ; create the loginMessage and save it to session as flashdata
-                  (done nil false (.flash req "loginMessage" "Oops! Wrong token.")))
+              (if (not (nil? user))
+                (db/get-one
+                  api-token-model {:userUid (.-uid user)}
+                  (fn [err api-token]
+                    (println "get-one api-token:" err api-token)
+                    (if (validate-api-token api-token token (:token-expires-in-sec config-auth))
+                      ; all is well, return successful user
+                      (done nil user)
+                      ; create the loginMessage and save it to session as flashdata
+                      (done nil false (.flash req "loginMessage" "Oops! Wrong token.")))))
                 ; req.flash is the way to set flashdata using connect-flash
                 (done nil false  (.flash req "loginMessage" "No user found."))))))))
 
-  (def-strategy-cb "facebook" config-auth user-model)
-  (def-strategy-cb "google" config-auth user-model)))
+  (def-strategy-cb "facebook" config-auth user-model api-token-model facebook-account-model)
+  (def-strategy-cb "google" config-auth user-model api-token-model google-account-model)
+    ))

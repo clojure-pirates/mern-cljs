@@ -9,13 +9,17 @@
   (case db-type
     "mongodb"
     (do 
-      (println endpoint)
       (node-require mongoose "mongoose")
       (.connect mongoose endpoint))
     "dynamodb"
     (do
+      (println "invoking node-require dynamoose...")
       (node-require dynamoose "dynamoose")
-      (if (= "local" endpoint)
-        (.local dynamoose)))
+      (println "...done")
+      (if (not (empty? endpoint))
+        (do (.local dynamoose endpoint)
+            (println "cljs" (.-endpointURL dynamoose))
+            (println "cljs" (aget (.ddb dynamoose) "endpoint" "host"))
+            ))) ; Is there a way to verify connection?
     (throw (js/Error. "[Error] Database type" db-type "not supported.")))
   (println "Connected to " db-type))

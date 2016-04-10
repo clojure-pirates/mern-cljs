@@ -114,7 +114,6 @@ look like:
 
 ## TODOs
 
-- Time-expire API token :D (It is a non-time-expering one time token)
 - Add Twitter auth
 
 ## References

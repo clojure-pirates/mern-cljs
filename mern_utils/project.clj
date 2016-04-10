@@ -21,6 +21,7 @@
                        [react "0.13.3"]
                        [express-session "1.13.0"]
                        [mongoose "4.4.12"]
+                       [dynamoose "0.4.1"]
                        ]
         :root :root}
 
