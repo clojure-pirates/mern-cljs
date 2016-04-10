@@ -8,8 +8,7 @@
     [cljs-time.core :as time-core]
     [cljs-time.coerce :as time-coerce]
     [hasch.core :as hasch]
-;    [mern-utils.mongoose :as db]))
-    [mern-utils.dynamoose :as db]))
+    [mern-utils.db :as db]))
 
 (node-require passport-local "passport-local")
 (def local-strategy (.-Strategy passport-local))
@@ -31,7 +30,6 @@
 (defn validate-api-token
   "Returns true if token is valid for the user"
   [api-token given-token token-expires-in-sec]
-  (println api-token given-token token-expires-in-sec)
   (let [expire-at (+ (* 1000 token-expires-in-sec) (.-tokenCreatedAt api-token))]
     (if (< expire-at (time-coerce/to-long (time-core/now)))
       false
@@ -54,12 +52,13 @@
     nil))
 
 (defn except [err]
-  (println err)
   (throw (js/Error. err)))
 
 (defn upsert-record [model query data then]
   (db/upsert model query data
-             (fn [err record] (if err (except err) (then record)))))
+             (fn [err & record]
+               (if err (except err)
+                 (then record)))))
 
 (defn create-record [model data then]
   (db/create model data
@@ -76,7 +75,7 @@
 (defn get-user-from-social-account-id [user-model social-account-model id then]
   (db/get-by-id social-account-model id
                 (fn [err acct]
-                  (do (println "account" acct err) (db/get-one user-model {:uid (:userUid acct)} then)))))
+                  (db/get-one user-model {:uid (:userUid acct)} then))))
 
 (defn register-new-user [strategy
                          user-model api-token-model social-account-model
@@ -117,7 +116,7 @@
   ; passport needs ability to serialize and unserialize users out of session
 
   ; used to serialize the user for the session
-  (.serializeUser passport (fn [user done] (do (println "serializing..." user) (done nil (.-uid user)))))
+  (.serializeUser passport (fn [user done] (done nil (.-uid user))))
 
   ; used to deserialize the user
   (.deserializeUser
@@ -158,7 +157,6 @@
                 (db/get-one
                   api-token-model {:userUid (.-uid user)}
                   (fn [err api-token]
-                    (println "get-one api-token:" err api-token)
                     (if (validate-api-token api-token token (:token-expires-in-sec config-auth))
                       ; all is well, return successful user
                       (done nil user)
