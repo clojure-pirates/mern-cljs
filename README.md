@@ -1,6 +1,6 @@
 # MERN-Cljs
 
-What is it?
+## What is it?
 
 - A web stack with
   [MongoDB](https://docs.mongodb.org/manual/introduction/)
@@ -17,6 +17,16 @@ What is it?
 
 For now, this repository serves to share the knowledge on how to achieve above
 and I don't intend to release a library or framework :)
+
+## Motivation
+
+I wanted to build web application very quickly. I find predominantly functional
+language such as Clojure to be a very powerful choice for speeding up the
+application development. Meanwhile, I wanted to leverage the development
+by the tools other people built and tested well already. So I chose to combine
+ClojureScript and node.js. This way, I can take advantage of very rich set of
+JavaScript libraries managed by [npm](https://www.npmjs.com). I don't have to
+switch language (e.g. Python <-> JavaScript) to develop backend and frontend.
 
 ## What you need to install
 
