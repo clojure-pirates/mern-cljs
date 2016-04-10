@@ -13,7 +13,7 @@
 (def MONGODB-DBNAME "merncljs_auth")
 
 (def DYNAMODB-DOMAIN LOCAL-IP)
-(def DYNAMODB-PORT 7893)
+(def DYNAMODB-PORT 8000)
 
 ; mongodb or dynamodb
 (def DATABASE "mongodb")

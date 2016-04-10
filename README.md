@@ -2,18 +2,26 @@
 
 What is it?
 
-- Stack with MongoDB Express React Node.js and ClojureScript
-- Build React backed web apps in Clojure (reagent + kioo)
-- Login with a social network account via Passport.js
-- Async worker via RabbitMQ
+- A web stack with
+  [MongoDB](https://docs.mongodb.org/manual/introduction/)
+  [Express](http://expressjs.com)
+  [React](https://facebook.github.io/react/)
+  [Node.js](https://nodejs.org)
+  and [ClojureScript](https://github.com/clojure/clojurescript)
+  ([DynamoDB](https://aws.amazon.com/dynamodb/) is also supported)
+- Build React backed web apps in Clojure (
+  [reagent](https://github.com/reagent-project/reagent) + [kioo](https://github.com/ckirkendall/kioo))
+- Login with a social network account via
+  [Passport.js](http://passportjs.org)
+- Async worker via [RabbitMQ](https://www.rabbitmq.com)
 
-For now, this repo serves to share the knowledge on how to achieve above
+For now, this repository serves to share the knowledge on how to achieve above
 and I don't intend to release a library or framework :)
 
 ## What you need to install
 
 1. Node.js
-2. MongoDB
+2. MongoDB (or DynamoDB)
 3. Leiningen
 
 ## How to run locally
@@ -43,9 +51,65 @@ lein run
 Point the browser to `http://localhost:1337/profile`
 (API server is served on port 5000 by default.)
 
-## Configuration
+## About the source code
 
-See example/common/src/common/config.cljs 
+This section shows where you should look at when you want to extend/develop
+your application.
+
+### example/common
+
+It contains configurations and object models:
+
+#### Configuration file
+
+example/common/src/common/config.cljs 
+
+#### Object models
+
+This web stack uses [Mongoose](http://mongoosejs.com) for object modeling
+([Dynamoose](https://github.com/automategreen/dynamoose) when used with
+DyanmoDB). See their docs for the Schema and Model generation.
+
+In the example app, you can find the user schema at
+example/common/src/common/models.
+Also check out example/common/src/common/model.cljs.
+
+### example/api
+
+API app.
+
+- example/api/src/api/core.cljs: Logic to start Express.js.
+- example/api/src/api/handlers.cljs: Handlers for each API endpoint.
+
+### example/www
+
+WWW app. It contains backend and frontend code.
+
+#### Backend
+
+- example/www/src/backend/server/core.cljs: Logic to start Express.js.
+- example/www/src/backend/server/handlers.cljs: Handlers for each web page. Triggers
+  server side rendering.
+- example/www/src/backend/server/views.cljs: Static view template with kioo.
+
+#### Frontend
+
+- example/www/src/frontend/app/core.cljs: Frontend logic. Trace from Ln 73
+  (def route) to find how profile is pulled from API server.
+- example/www/src/frontend/app/atom.cljs: Application state.
+- example/www/src/frontend/app/views.cljs: Dynamic view implementation with kioo.
+
+#### HTML templates
+
+- example/resources/public
+
+### example/worker
+
+Worker instance that executes async tasks. This is turned off by default since
+it requires RabbitMQ. See Async tasks section to find how to turn it on.
+
+- example/worker/src/worker/core.cljs: Core async task logic and example task
+  ("log" function)
 
 ## About API Authentication process
 
@@ -64,7 +128,7 @@ brew install rabbitmq
 brew services start rabbitmq
 ```
 
-Then uncomment `create-amqp-conn` around Ln. 39 of `example/api/src/api/core.cljs`:
+Then uncomment `create-amqp-conn` around Ln. 37 of `example/api/src/api/core.cljs`:
 
 ```
 ...
@@ -108,12 +172,43 @@ look like:
  [x] Received message hello
 ```
 
+When http://localhost:5000/task is requested (GET), the api server code
+(handle_task function in example/api/src/api/handlers.cljs) send the message
+to RabbitMQ. The worker app takes the message to execute the log function
+in example/worker/src/worker/core.cljs.
+
+The log function is not a good example of async task. The idea is to avoid
+API server to process time consuming tasks. In production, we can deploy multiple
+worker instances to do pararell task execution.
+
+## DynamoDB
+
+You can use DynamoDB instead of MongoDB.
+
+To test locally, install and start
+[DynamoDB local](http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Tools.DynamoDBLocal.html).
+
+Then edit example/common/src/common/config.cljs:
+
+```
+; mongodb or dynamodb
+(def DATABASE "mongodb")
+(def DB-ENDPOINT (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
+
+; (def DATABASE "dynamodb")
+; Keep DynamoDB endpoint nil to use AWS (non-local)
+; (def DB-ENDPOINT (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))
+```
+
+Recompile and start www and api (and worker) apps.
+
 ## Issues
 
-- Google Auth requires consent everytime the page reloads
+- Google Auth requires consent every time the page reloads
 
 ## TODOs
 
+- Production deployment code.
 - Add Twitter auth
 
 ## References

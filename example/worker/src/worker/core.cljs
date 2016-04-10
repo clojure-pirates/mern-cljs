@@ -17,6 +17,7 @@
 
 (def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
 
+; Note "^:export" is necessary for a function to be called by resolve-cljs
 (defn ^:export log [data]
   (println "[info] Received message:" (:message data)))
  
