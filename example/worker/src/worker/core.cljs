@@ -8,7 +8,8 @@
     [mern-utils.amqp :refer [start-worker]]
     [mern-utils.db :as db]
     [mern-utils.lib :refer [local-ip deserialize resolve-cljs]]
-    [common.config :refer [DATABASE DB-ENDPOINT RABBITMQ-DOMAIN RABBITMQ-PORT]]))
+    [common.config :refer [DATABASE DB-ENDPOINT
+                           RABBITMQ-DOMAIN RABBITMQ-PORT]]))
 
 (enable-console-print!)
 

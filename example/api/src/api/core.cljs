@@ -6,15 +6,15 @@
     [cljs.nodejs :as nodejs]
     [mern-utils.db :as db]
     [mern-utils.lib :refer [local-ip]]
-    [mern-utils.amqp :refer [create-amqp-conn]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
+    [mern-utils.amqp :refer [create-amqp-conn]]
     [common.config :refer [DATABASE DB-ENDPOINT
-                           RABBITMQ-DOMAIN RABBITMQ-PORT
-                           API-DOMAIN API-PORT
-                           WWW-DOMAIN WWW-PORT
+                           RABBITMQ-DOMAIN RABBITMQ-PORT RABBITMQ-DEFAULT-QUEUE
+                           API-DOMAIN API-PORT 
+                           WWW-DOMAIN WWW-PORT 
                            config-auth cors-options]]
-    [common.models :refer [user]]
+    [common.models :refer [user-model api-token-model facebook-account-model google-account-model]]
     [api.handlers :refer [route-table
                           homepage-handler
                           me-handler
@@ -46,12 +46,11 @@
     (.use (connect-flash))
     (route @route-table cors-options)
     (.listen API-PORT API-DOMAIN success)
-    )
-)
+    ))
 
 (defn -main [& mess]
   (db/connect DATABASE DB-ENDPOINT)
-  (config-passport passport config-auth user)
+  (config-passport passport config-auth (user-model) (api-token-model) (facebook-account-model) (google-account-model))
   (server #(println (str "Server running at http://" local-ip ":" API-PORT "/"))))
 
 (set! *main-cli-fn* -main)

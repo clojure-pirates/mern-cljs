@@ -7,7 +7,6 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.48"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 ; Added by Daigo
                  [com.cognitect/transit-cljs "0.8.220"]
                  [com.cemerick/piggieback "0.2.1"]
                  [com.cemerick/url "0.1.1"]
@@ -17,10 +16,11 @@
 
   :npm {:dependencies [[xmlhttprequest "1.8.0"]
                        [source-map-support "0.4.0"]
-                       ; Added by Daigo
-                       [mongoose "latest"]
+                       [mongoose "4.4.12"]
+                       [dynamoose "0.4.1"]
                        [amqplib "latest"]
-                       [when "latest"]]
+                       [when "latest"]
+                       ]
         :root :root}
 
   :plugins [[lein-cljsbuild "1.1.0"]

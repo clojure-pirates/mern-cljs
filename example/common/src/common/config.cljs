@@ -12,8 +12,16 @@
 (def MONGODB-PORT 27017)
 (def MONGODB-DBNAME "merncljs_auth")
 
+(def DYNAMODB-DOMAIN LOCAL-IP)
+(def DYNAMODB-PORT 7893)
+
+; mongodb or dynamodb
 (def DATABASE "mongodb")
 (def DB-ENDPOINT (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
+
+; (def DATABASE "dynamodb")
+; Keep DynamoDB endpoint nil to use AWS (non-local)
+; (def DB-ENDPOINT (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))
 
 (def RABBITMQ-DOMAIN LOCAL-IP)
 (def RABBITMQ-PORT 5672)

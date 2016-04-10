@@ -2,8 +2,12 @@
   (:require-macros
     [mern-utils.macros :refer [node-require, node-config defroute]])
   (:require
+    [clojure.string :as str]
     [cljs.nodejs :as nodejs]
-    [mern-utils.amqp :refer [queue-task amqp-state]]))
+    [cemerick.url :refer [url]]
+    [mern-utils.lib :refer [str->hex get-url-params]]
+    [mern-utils.amqp :refer [queue-task amqp-state]]
+    [mern-utils.db :as db]))
 
 (defonce route-table (atom []))  ; defroute macro needs this
 (node-require express "express")
@@ -31,11 +35,13 @@
 
 (defroute login-handler "post" "/login"
   (do
+    (println "login invoked")
     ((.authenticate
        passport
        "local-login"
        (clj->js {:session true})
        (fn [err user info]
+         (println "login user" user)
          (if err
            (-> res
              (.status 401)
