@@ -12,11 +12,10 @@
            (~'get-user-from-social-account-id
              ~user-model ~social-account-model (.-id ~'profile)
              (fn [~'err ~'user]
-               (println "get-one at def-strategy-cb" ~'err ~'user)
                (if ~'err
                  (~'done ~'err)
                  (if ~'user
-                   (~'refresh-api-token ~api-token-model (:uid ~'user) (fn [~'api-token] (~'done nil ~'user)))
+                   (~'refresh-api-token ~api-token-model (.-uid ~'user) (fn [~'api-token] (~'done nil ~'user)))
                    (~'register-new-user ~strategy
                                         ~user-model ~api-token-model ~social-account-model
                                         (:email-domain-restriction ~config-auth)

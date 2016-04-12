@@ -65,21 +65,27 @@
              (fn [err record] (if err (except err) (then record)))))
 
 (defn refresh-api-token [api-token-model user-uid then]
+  (println "Refreshing API token for " user-uid)
   (let [api-token (create-api-token)
-        data {:userUid user-uid
-              :token (:token api-token)
-              :tokenCreatedAt (:created-at api-token)}]
-  (db/upsert api-token-model {:userUid user-uid} data
+        data {:token (:token api-token)
+              :tokenCreatedAt (:created-at api-token)}
+        query {:userUid user-uid}]
+  (db/upsert api-token-model query data
              (fn [err record] (if err (except err) (then record))))))
 
 (defn get-user-from-social-account-id [user-model social-account-model id then]
   (db/get-by-id social-account-model id
                 (fn [err acct]
-                  (db/get-one user-model {:uid (:userUid acct)} then))))
+                  (if err
+                    (then err nil)
+                    (if acct
+                      (db/get-one user-model {:uid (.-userUid acct)} then)
+                      (then nil nil))))))
 
 (defn register-new-user [strategy
                          user-model api-token-model social-account-model
                          email-domain-restriction token profile done]
+  (println "Registering a new user")
   (if (and email-domain-restriction
            (or (= (.-emails profile) js/undefined)
                (not= email-domain-restriction
@@ -88,21 +94,22 @@
     (let [full-name   (get-full-name profile)
           email       (get-email profile)
           photo       (get-photo profile)
-          user-data   {:uid (create-uid)
+          user-uid    (create-uid)
+          user-data   {:uid user-uid
                        :name full-name
                        :email email
                        :photo photo}
           social-acct {:id (.-id profile)
-                       :userUid (:uid user-data)
+                       :userUid user-uid
                        :token token
                        :name full-name
                        :email email
                        :photo photo}]
-      (upsert-record
-        social-account-model {:id (:id social-acct)} social-acct
+      (create-record
+        social-account-model social-acct
         (fn [acct]
           (refresh-api-token
-            api-token-model (:uid user-data)
+            api-token-model (.-userUid acct)
             (fn [api-token]
               (create-record
                 user-model user-data

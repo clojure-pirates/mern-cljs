@@ -2,6 +2,8 @@
   (:require
     [mern-utils.lib :refer [local-ip]]))
 
+(def IS-PRODUCTION false)
+
 (def LOCAL-IP "localhost")
 ;(def LOCAL-IP "0.0.0.0")
 ; You need to use local-ip instead to access from other devices.
@@ -16,12 +18,13 @@
 (def DYNAMODB-PORT 8000)
 
 ; mongodb or dynamodb
-(def DATABASE "mongodb")
-(def DB-ENDPOINT (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
+; (def DATABASE "mongodb")
+(def DATABASE "dynamodb")
 
-; (def DATABASE "dynamodb")
-; Keep DynamoDB endpoint nil to use AWS (non-local)
-; (def DB-ENDPOINT (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))
+(def DB-ENDPOINT
+  (case DATABASE
+    "mongodb" (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME)
+    "dynamodb" (if IS-PRODUCTION nil (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))))
 
 (def RABBITMQ-DOMAIN LOCAL-IP)
 (def RABBITMQ-PORT 5672)

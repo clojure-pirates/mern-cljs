@@ -33,8 +33,9 @@
   (.update model (clj->js query) (clj->js data) then))
 
 (defn upsert [model query data then]
-  (.update model (clj->js query) (clj->js data) (clj->js {:upsert true})
-           (fn [err info]
-             (if err
-               (then err nil)
-               (get-one model {:uid (:uid data)} (fn [err record] (then nil record)))))))
+  (let [data-w-key (conj data query)]
+    (.update model (clj->js query) (clj->js data-w-key) (clj->js {:upsert true})
+             (fn [err info]
+               (if err
+                 (then err nil)
+                 (get-one model {:uid (:uid data)} (fn [err record] (then nil record))))))))

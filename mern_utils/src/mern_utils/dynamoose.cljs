@@ -28,4 +28,8 @@
 
 (defn upsert [model query data then]
   (update- model query data
-    (fn [err] (if err (create model data then) then))))
+    (fn [err]
+      (if err
+        (let [data-w-key (conj data query)]
+          (create model data-w-key then))
+        (then)))))
