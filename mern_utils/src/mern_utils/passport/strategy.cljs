@@ -8,7 +8,8 @@
     [cljs-time.core :as time-core]
     [cljs-time.coerce :as time-coerce]
     [hasch.core :as hasch]
-    [mern-utils.db :as db]))
+    [mern-utils.db :as db]
+    [mern-utils.lib :refer [raise]]))
 
 (node-require passport-local "passport-local")
 (def local-strategy (.-Strategy passport-local))
@@ -51,18 +52,15 @@
     (.-value (first (.-photos profile)))
     nil))
 
-(defn except [err]
-  (throw (js/Error. err)))
-
 (defn upsert-record [model query data then]
   (db/upsert model query data
              (fn [err & record]
-               (if err (except err)
+               (if err (raise err)
                  (then record)))))
 
 (defn create-record [model data then]
   (db/create model data
-             (fn [err record] (if err (except err) (then record)))))
+             (fn [err record] (if err (raise err) (then record)))))
 
 (defn refresh-api-token [api-token-model user-uid then]
   (println "Refreshing API token for " user-uid)
@@ -71,7 +69,7 @@
               :tokenCreatedAt (:created-at api-token)}
         query {:userUid user-uid}]
   (db/upsert api-token-model query data
-             (fn [err record] (if err (except err) (then record))))))
+             (fn [err record] (if err (raise err) (then record))))))
 
 (defn get-user-from-social-account-id [user-model social-account-model id then]
   (db/get-by-id social-account-model id

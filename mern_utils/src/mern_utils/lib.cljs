@@ -8,6 +8,9 @@
     [cemerick.url :refer [url url-encode]]
     [cljs.nodejs :as nodejs]))
 
+(defn raise [err]
+  (throw (js/Error. err)))
+
 ; http://stackoverflow.com/questions/10062967/clojures-equivalent-to-pythons-encodehex-and-decodehex
 (defn str->hex
   "Encode numbers into hex string"
