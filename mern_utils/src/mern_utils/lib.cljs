@@ -37,13 +37,7 @@
 (defn deserialize [string]
   "Deserialize json into cljs map"
   (let [r (transit/reader :json)
-        input (-> string
-                  (str/replace #"\"([^\"]*)\":" #"\"~:$1\":")
-                  (str/replace #"/\\" "")
-                  (str/replace "\\\":" "\":")
-                  (str/replace "/\"" "\"")
-                  (str/replace "/'/" "'")
-                  (str/replace "/{" "{"))]
+        input (str/replace string #"\"([^\"]*)\":" "\"~:$1\":")]
     (transit/read r input)))
 
 (defn get-js-to-def-vars
@@ -53,8 +47,11 @@
         raw (apply str (map #(str (first %) "='" (str/replace (second %) #"'" #"\'") "',") pairs))]
     (str "var " (subs raw 0 (dec (count raw))) ";")))
 
+(defn clean-url [url]
+  (str/replace url #"%([^0-9]|$)" "%25$1"))
+
 (defn get-url-params [req]
-  (keywordize-keys (:query (url (.-originalUrl req)))))
+  (keywordize-keys (:query (url (clean-url (.-originalUrl req))))))
 
 (defn set-next-url-from-param
   "Convenience funciton for backend handlers to set next url after auth in cookie"

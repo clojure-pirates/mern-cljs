@@ -7,12 +7,14 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.48"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 [com.andrewmcveigh/cljs-time "0.4.0"]
                  [reagent "0.5.1"]
                  [kioo "0.4.1"]
                  [com.cognitect/transit-cljs "0.8.220"] 
                  [com.cemerick/piggieback "0.2.1"]
                  [com.cemerick/url "0.1.1"]
-                 [cljs-ajax "0.5.3"]]
+                 [cljs-ajax "0.5.3"]
+                 [net.polyc0l0r/hasch "0.2.3"]]
 
   :npm {:dependencies [[express "4.13.4"]
                        [xmlhttprequest "1.8.0"]
@@ -26,7 +28,8 @@
         :root :root}
 
   :plugins [[lein-cljsbuild "1.1.0"]
-            [lein-npm "0.6.1"]]
+            [lein-npm "0.6.1"]
+            [lein-doo "0.1.6"]]
 
   :min-lein-version "2.1.2"
 
@@ -38,12 +41,21 @@
                                     "node_modules"
                                     :target-path :compile-path]
 
+  :doo {:build "test"}
+
   :cljsbuild {:builds
               [
-               {:source-paths ["src"]
+               {:id "prod"
+                :source-paths ["src"]
                 :compiler {:target :nodejs
                            :output-to "main.js"
                            :output-dir "target"
                            :optimizations :none
-                           :pretty-print true}
-                }]})
+                           :pretty-print true}}
+               {:id "test"
+                :source-paths ["src" "test"]
+                :compiler {:target :nodejs
+                           :output-to "resources/public/js/testable.js"
+                           :main mern-utils.test.runner
+                           :optimizations :none}}
+               ]})

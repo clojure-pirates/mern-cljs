@@ -1,4 +1,5 @@
 /target
+/out
 /classes
 pom.xml
 pom.xml.asc
