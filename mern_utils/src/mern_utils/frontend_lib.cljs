@@ -1,15 +1,17 @@
 (ns mern-utils.frontend-lib
   (:require 
     [goog.dom :as dom]
+    [clojure.string :as str]
     [cemerick.url :refer (url url-encode)]
     [clojure.walk :refer [keywordize-keys]]
-    [ajax.core :refer [GET POST]]))
+    [ajax.core :refer [GET POST]]
+    [mern-utils.lib :refer [clean-url]]))
 
 (defn redirect [url]
   (set! (.-location (dom/getWindow)) url))
 
 (defn get-location []
-   (url (-> (dom/getWindow) .-location)))
+  (url (clean-url (str (.-location (dom/getWindow))))))
 
 (defn get-path []
   (:path (get-location)))
@@ -24,11 +26,6 @@
   "Get global JS variables"
   [var-name]
   (aget (js* "window") var-name))
-
-(defn set-timeout
-  "Async execute with delay in miliseconds"
-  [then msec]
-  (js/setTimeout then msec))
 
 (defn post-json [uri data nextfn errorfn]
   (POST uri

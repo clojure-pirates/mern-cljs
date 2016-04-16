@@ -138,15 +138,7 @@ brew install rabbitmq
 brew services start rabbitmq
 ```
 
-Then uncomment `create-amqp-conn` around Ln. 37 of `example/api/src/api/core.cljs`:
-
-```
-...
-(defn server [success]
-; Activate the next line if you want to run async task 
-; (create-amqp-conn amqp-endpoint)
-...
-```
+Then set `USE-RABBITMQ` to `true` in `example/common/src/common/config.cljs`:
 
 Recompile and run api instance:
 

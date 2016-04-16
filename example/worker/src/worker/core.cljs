@@ -7,7 +7,8 @@
     [clojure.string :as str]
     [mern-utils.amqp :refer [start-worker]]
     [mern-utils.db :as db]
-    [mern-utils.lib :refer [local-ip deserialize resolve-cljs]]
+    [mern-utils.backend-lib :refer [local-ip]]
+    [mern-utils.lib :refer [deserialize resolve-cljs]]
     [common.config :refer [DATABASE DB-ENDPOINT
                            RABBITMQ-DOMAIN RABBITMQ-PORT]]))
 

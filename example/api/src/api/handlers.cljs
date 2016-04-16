@@ -5,7 +5,8 @@
     [clojure.string :as str]
     [cljs.nodejs :as nodejs]
     [cemerick.url :refer [url]]
-    [mern-utils.lib :refer [str->hex get-url-params]]
+    [mern-utils.lib :refer [str->hex]]
+    [mern-utils.backend-lib :refer [get-url-params]]
     [mern-utils.amqp :refer [queue-task amqp-state]]
     [mern-utils.db :as db]))
 

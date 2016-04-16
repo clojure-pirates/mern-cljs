@@ -7,7 +7,7 @@
     [cljs.nodejs :as nodejs]  
     [clojure.string :as string]
     [cognitect.transit :as transit]
-    [mern-utils.lib :refer [local-ip]]))
+    [mern-utils.backend-lib :refer [local-ip]]))
 
 (defn write-json-str [x]                                                        
   (let [w (transit/writer :json-verbose)]

@@ -1,6 +1,6 @@
 (ns common.config
   (:require
-    [mern-utils.lib :refer [local-ip]]))
+    [mern-utils.backend-lib :refer [local-ip]]))
 
 (def IS-PRODUCTION false)
 
@@ -18,14 +18,15 @@
 (def DYNAMODB-PORT 8000)
 
 ; mongodb or dynamodb
-; (def DATABASE "mongodb")
-(def DATABASE "dynamodb")
+(def DATABASE "mongodb")
+; (def DATABASE "dynamodb")
 
 (def DB-ENDPOINT
   (case DATABASE
     "mongodb" (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME)
     "dynamodb" (if IS-PRODUCTION nil (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))))
 
+(def USE-RABBITMQ false)
 (def RABBITMQ-DOMAIN LOCAL-IP)
 (def RABBITMQ-PORT 5672)
 (def RABBITMQ-DEFAULT-QUEUE "task_queue")

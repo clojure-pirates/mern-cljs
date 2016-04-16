@@ -5,7 +5,7 @@
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
     [mern-utils.db :as db]
-    [mern-utils.lib :refer [local-ip]]
+    [mern-utils.backend-lib :refer [local-ip]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
     [common.config :refer [DATABASE DB-ENDPOINT WWW-DOMAIN WWW-PORT config-auth cors-options]]

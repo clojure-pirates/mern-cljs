@@ -6,7 +6,7 @@
     [clojure.string :as string]
     [cognitect.transit :as transit]
     [cemerick.url :refer (url url-encode)]
-    [mern-utils.lib :refer [set-next-url-from-param get-uid-token get-js-to-def-vars]]
+    [mern-utils.backend-lib :refer [set-next-url-from-param get-uid-token get-js-to-def-vars]]
     [mern-utils.express :refer [render]]
     [mern-utils.view :refer [render-page]]
     [server.views :refer [home-view login-view profile-view]]))

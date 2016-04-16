@@ -5,11 +5,12 @@
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
     [mern-utils.db :as db]
-    [mern-utils.lib :refer [local-ip]]
+    [mern-utils.backend-lib :refer [local-ip]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
     [mern-utils.amqp :refer [create-amqp-conn]]
     [common.config :refer [DATABASE DB-ENDPOINT
+                           USE-RABBITMQ
                            RABBITMQ-DOMAIN RABBITMQ-PORT RABBITMQ-DEFAULT-QUEUE
                            API-DOMAIN API-PORT 
                            WWW-DOMAIN WWW-PORT 
@@ -33,8 +34,8 @@
 (def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
 
 (defn server [success]
-  ; Activate the next line if you want to run async task
-  ; (create-amqp-conn amqp-endpoint)
+  (if USE-RABBITMQ
+    (create-amqp-conn amqp-endpoint))
   (doto (express)
     (.use (.static express "resources/public"))
     (.use (morgan "dev"))
