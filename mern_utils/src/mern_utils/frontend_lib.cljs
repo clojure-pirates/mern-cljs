@@ -2,22 +2,21 @@
   (:require 
     [goog.dom :as dom]
     [clojure.string :as str]
-    [cemerick.url :refer (url url-encode)]
+    [cemerick.url :refer [url]]
     [clojure.walk :refer [keywordize-keys]]
-    [ajax.core :refer [GET POST]]
-    [mern-utils.lib :refer [clean-url]]))
+    [ajax.core :refer [GET POST]]))
 
 (defn redirect [url]
   (set! (.-location (dom/getWindow)) url))
 
 (defn get-location []
-  (url (clean-url (str (.-location (dom/getWindow))))))
+  (str (.-location (dom/getWindow))))
 
 (defn get-path []
-  (:path (get-location)))
+  (:path (url (get-location))))
 
 (defn get-url-params []
-  (keywordize-keys (:query (get-location))))
+  (keywordize-keys (:query (url (get-location)))))
 
 (defn get-elems-by-tag-name [tag]
   (dom/getElementsByTagNameAndClass tag))

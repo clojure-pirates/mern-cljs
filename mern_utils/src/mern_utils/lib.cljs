@@ -5,8 +5,7 @@
     [clojure.string :as str]
     [cognitect.transit :as transit]
     [clojure.walk :refer [keywordize-keys]]
-    [cemerick.url :refer [url url-encode]]
-    [cljs.nodejs :as nodejs]))
+    [cemerick.url :refer [url url-encode]]))
 
 (defn raise [err]
   (throw (js/Error. err)))
@@ -39,9 +38,6 @@
   (let [r (transit/reader :json)
         input (str/replace string #"\"([^\"]*)\":" "\"~:$1\":")]
     (transit/read r input)))
-
-(defn clean-url [url]
-  (str/replace url #"%([^0-9]|$)" "%25$1"))
 
 (defn set-timeout
   "Async execute with delay in miliseconds"

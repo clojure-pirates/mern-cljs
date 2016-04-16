@@ -5,21 +5,22 @@
     [clojure.string :as str]
     [cognitect.transit :as transit]
     [clojure.walk :refer [keywordize-keys]]
-    [cemerick.url :refer [url url-encode]]
-    [cljs.nodejs :as nodejs]
-    [mern-utils.lib :refer [clean-url]]))
+    [cemerick.url :refer [url]]
+    [cljs.nodejs :as nodejs]))
+
+(defn get-location [req]
+  (.-originalUrl req))
 
 (defn get-path [req]
-  (:path (url (clean-url (.-originalUrl req)))))
+  (:path (url (get-location req))))
 
 (defn get-url-params [req]
-  (keywordize-keys (:query (url (clean-url (.-originalUrl req))))))
+  (keywordize-keys (:query (url (get-location req)))))
 
 (defn set-next-url-from-param
   "Convenience funciton for backend handlers to set next url after auth in cookie"
   [req res fallback]
   (let [params (get-url-params req)]
-    (println (:next params))
     (.cookie res "nextUrl" (str "/" (or (:next params) fallback)))))
 
 (defn get-uid-token
