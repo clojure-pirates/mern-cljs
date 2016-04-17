@@ -34,11 +34,17 @@
 (defn create [model data then]
   (resolve-cljs (str (:ns @database) "/create") model data then))
 
+(defn get-all [model query then]
+  (resolve-cljs (str (:ns @database) "/get-all") model query then))
+
 (defn get-one [model query then]
   (resolve-cljs (str (:ns @database) "/get-one") model query then))
 
 (defn get-by-id [model id then]
   (resolve-cljs (str (:ns @database) "/get-by-id") model id then))
+
+(defn get-count [model query then]
+  (resolve-cljs (str (:ns @database) "/get-count") model query then))
 
 (defn update- [model query data then]
   (resolve-cljs (str (:ns @database) "/update-") model query data then))
