@@ -68,8 +68,8 @@
         data {:token (:token api-token)
               :tokenCreatedAt (:created-at api-token)}
         query {:userUid user-uid}]
-  (db/upsert api-token-model query data
-             (fn [err record] (if err (raise err) (then record))))))
+    (db/upsert api-token-model query data
+               (fn [err record] (if err (raise err) (then record))))))
 
 (defn get-user-from-social-account-id [user-model social-account-model id then]
   (db/get-by-id social-account-model id

@@ -22,8 +22,10 @@
                        [source-map-support "0.4.0"]
                        [react "0.13.3"]
                        [express-session "1.13.0"]
+                       [aws-sdk "2.3.3"]
                        [mongoose "4.4.12"]
-                       [dynamoose "0.4.1"]
+                       [joi "8.0.5"]
+                       [vogels "2.2.0"]
                        ]
         :root :root}
 

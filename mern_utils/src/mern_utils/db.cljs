@@ -5,11 +5,11 @@
     [cljs.nodejs :as nodejs]
     [mern-utils.lib :refer [resolve-cljs]]
     [mern-utils.mongoose]
-    [mern-utils.dynamoose]))
+    [mern-utils.vogels]))
 
 (defonce database (atom {}))
 
-(defn connect [db-type endpoint]
+(defn connect [db-type endpoint & aws-config]
   (case db-type
     "mongodb"
     (do 
@@ -18,10 +18,21 @@
       (.connect mongoose endpoint))
     "dynamodb"
     (do
-      (swap! database assoc :ns "mern-utils.dynamoose")
-      (node-require dynamoose "dynamoose")
+      (swap! database assoc :ns "mern-utils.vogels")
+      (node-require vogels "vogels")
       (if (not (empty? endpoint))
-        (.local dynamoose endpoint)))
+        (do
+          (node-require aws "aws-sdk")
+          (let [aws-endpoint-obj (.-Endpoint aws)
+                aws-endpoint (new aws-endpoint-obj endpoint)
+                aws-dynamodb-obj (.-DynamoDB aws)
+                dynamodb (new aws-dynamodb-obj (clj->js {:endpoint aws-endpoint}))]
+            (.update (.-config aws)
+                     (clj->js
+                       {:accessKeyId (:accessKeyId aws-config)
+                        :secretAccessKey (:secretAccessKey aws-config)
+                        :region (:region aws-config)}))
+            (.dynamoDriver vogels dynamodb)))))
     (throw (js/Error. "[Error] Database type" db-type "not supported.")))
   (println "Connected to " db-type))
 
