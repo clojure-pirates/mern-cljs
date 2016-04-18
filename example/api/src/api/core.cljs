@@ -9,7 +9,7 @@
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
     [mern-utils.amqp :refer [create-amqp-conn]]
-    [common.config :refer [DATABASE DB-ENDPOINT
+    [common.config :refer [DATABASE DB-ENDPOINT AWS-CONFIG
                            USE-RABBITMQ
                            RABBITMQ-DOMAIN RABBITMQ-PORT RABBITMQ-DEFAULT-QUEUE
                            API-DOMAIN API-PORT 
@@ -50,7 +50,7 @@
     ))
 
 (defn -main [& mess]
-  (db/connect DATABASE DB-ENDPOINT)
+  (db/connect DATABASE DB-ENDPOINT AWS-CONFIG)
   (config-passport passport config-auth (user-model) (api-token-model) (facebook-account-model) (google-account-model))
   (server #(println (str "Server running at http://" local-ip ":" API-PORT "/"))))
 

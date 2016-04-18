@@ -16,8 +16,9 @@
 
   :npm {:dependencies [[xmlhttprequest "1.8.0"]
                        [source-map-support "0.4.0"]
+                       [aws-sdk "2.3.3"]
                        [mongoose "4.4.12"]
-                       [dynamoose "0.4.1"]
+                       [vogels "2.2.0"]
                        [amqplib "latest"]
                        [when "latest"]
                        ]

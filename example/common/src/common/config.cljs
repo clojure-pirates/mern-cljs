@@ -1,5 +1,6 @@
 (ns common.config
   (:require
+    [cljs.nodejs :as nodejs]
     [mern-utils.backend-lib :refer [local-ip]]))
 
 (def IS-PRODUCTION false)
@@ -68,3 +69,10 @@
   (clj->js {:origin (str "http://" LOCAL-IP ":" WWW-PORT)
             :credentials true
             :allowedHeaders "Authorization,Origin,X-Requested-With,Content-Type,Accept"}))
+
+(def AWS-ACCESS-KEY-ID (.. nodejs/process -env -AWS_ACCESS_KEY_ID))
+(def AWS-SECRET-ACCESS-KEY (.. nodejs/process -env -AWS_SECRET_ACCESS_KEY))
+(def AWS-REGION (.. nodejs/process -env -AWS_REGION))
+(def AWS-CONFIG {:accessKeyId AWS-ACCESS-KEY-ID
+                 :secretAccessKey AWS-SECRET-ACCESS-KEY
+                 :region AWS-REGION})

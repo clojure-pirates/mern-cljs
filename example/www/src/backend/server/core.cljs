@@ -8,7 +8,7 @@
     [mern-utils.backend-lib :refer [local-ip]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
-    [common.config :refer [DATABASE DB-ENDPOINT WWW-DOMAIN WWW-PORT config-auth cors-options]]
+    [common.config :refer [DATABASE DB-ENDPOINT AWS-CONFIG WWW-DOMAIN WWW-PORT config-auth cors-options]]
     [common.models :refer [user-model api-token-model facebook-account-model google-account-model]]
     [server.handlers :refer [route-table]]))
 
@@ -43,7 +43,7 @@
 )
 
 (defn -main [& mess]
-  (db/connect DATABASE DB-ENDPOINT)
+  (db/connect DATABASE DB-ENDPOINT AWS-CONFIG)
   (config-passport passport config-auth (user-model) (api-token-model) (facebook-account-model) (google-account-model))
   (server #(println (str "Server running at http://" local-ip ":" WWW-PORT "/"))))
 

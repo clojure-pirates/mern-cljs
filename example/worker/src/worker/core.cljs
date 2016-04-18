@@ -9,7 +9,7 @@
     [mern-utils.db :as db]
     [mern-utils.backend-lib :refer [local-ip]]
     [mern-utils.lib :refer [deserialize resolve-cljs]]
-    [common.config :refer [DATABASE DB-ENDPOINT
+    [common.config :refer [DATABASE DB-ENDPOINT AWS-CONFIG
                            RABBITMQ-DOMAIN RABBITMQ-PORT]]))
 
 (enable-console-print!)
@@ -27,7 +27,7 @@
     (resolve-cljs (str "worker.core/" (:fn task)) (:data task))))
 
 (defn -main [& mess]
-  (db/connect DATABASE DB-ENDPOINT)
+  (db/connect DATABASE DB-ENDPOINT AWS-CONFIG)
   (start-worker amqp-endpoint task-handler #(println (str "Worker running at http://" local-ip))))
 
 (set! *main-cli-fn* -main)
