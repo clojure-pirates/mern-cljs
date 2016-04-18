@@ -77,7 +77,7 @@ example/common/src/common/config.cljs
 #### Object models
 
 This web stack uses [Mongoose](http://mongoosejs.com) for object modeling
-([Dynamoose](https://github.com/automategreen/dynamoose) when used with
+([Vogels](https://github.com/ryanfitz/vogels) when used with
 DyanmoDB). See their docs for the Schema and Model generation.
 
 In the example app, you can find the user schema at
@@ -195,24 +195,10 @@ Then edit example/common/src/common/config.cljs:
 ```
 ; mongodb or dynamodb
 (def DATABASE "mongodb")
-(def DB-ENDPOINT (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME))
-
 ; (def DATABASE "dynamodb")
-; Keep DynamoDB endpoint nil to use AWS (non-local)
-; (def DB-ENDPOINT (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))
 ```
 
+DynamoDB local's default port is 8000. The config variable `DYNAMODB-PORT` is
+also set as 8000 in the example app.
+
 Recompile and start www and api (and worker) apps.
-
-## Issues
-
-- Google Auth requires consent every time the page reloads
-
-## TODOs
-
-- Production deployment code.
-- Add Twitter auth
-
-## References
-
-- [Easy Node Authentication: Setup and Local | Scotch](https://scotch.io/tutorials/easy-node-authentication-setup-and-local)
