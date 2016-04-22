@@ -62,3 +62,6 @@
 
 (defn upsert [model query data then]
   (resolve-cljs (str (:ns @database) "/upsert") model query data then))
+
+(defn query [model query]
+  (resolve-cljs (str (:ns @database) "/query") model query))

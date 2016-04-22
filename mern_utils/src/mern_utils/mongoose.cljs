@@ -23,25 +23,27 @@
 (defn create [model data then]
   (.create model (clj->js data) then))
 
-(defn get-all [model query then]
-  (.find model (clj->js query) then))
+(defn get-all [model query-key then]
+  (.find model (clj->js query-key) then))
 
-(defn get-one [model query then]
-  (.findOne model (clj->js query) then))
+(defn get-one [model query-key then]
+  (.findOne model (clj->js query-key) then))
 
-(defn get-by-id [model id then]
-  (get-one model {:id id} then))
+(defn update- [model query-key data then]
+  (.update model (clj->js query-key) (clj->js data) then))
 
-(defn get-count [model query then]
-  (.count model (clj->js query) then))
-
-(defn update- [model query data then]
-  (.update model (clj->js query) (clj->js data) then))
-
-(defn upsert [model query data then]
-  (let [data-w-key (conj data query)]
-    (.update model (clj->js query) (clj->js data-w-key) (clj->js {:upsert true})
+(defn upsert [model query-key data then]
+  (let [data-w-key (conj data query-key)]
+    (.update model (clj->js query-key) (clj->js data-w-key) (clj->js {:upsert true})
              (fn [err info]
                (if err
                  (then err nil)
                  (get-one model {:uid (:uid data)} (fn [err record] (then nil record))))))))
+
+(defn query [model query-key]
+  (.find model (clj->js query-key)))
+
+(defn get-count [model query-key then]
+  (doto
+    (query model query-key)
+    (.count then)))

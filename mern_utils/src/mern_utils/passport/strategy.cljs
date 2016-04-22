@@ -72,7 +72,7 @@
                (fn [err record] (if err (raise err) (then record))))))
 
 (defn get-user-from-social-account-id [user-model social-account-model id then]
-  (db/get-by-id social-account-model id
+  (db/get-one social-account-model {:id id}
                 (fn [err acct]
                   (if err
                     (then err nil)
