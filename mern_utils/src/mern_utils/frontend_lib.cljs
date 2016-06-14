@@ -21,6 +21,9 @@
 (defn get-elems-by-tag-name [tag]
   (dom/getElementsByTagNameAndClass tag))
 
+(defn get-elem [id]
+  (dom/getElement id))
+
 (defn get-js-var
   "Get global JS variables"
   [var-name]
