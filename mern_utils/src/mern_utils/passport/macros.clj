@@ -31,4 +31,4 @@
                 :callbackURL (get-in ~config-auth [(keyword (str ~strategy "-auth")) :callback-url])
                 :profileFields (get-in ~config-auth [(keyword (str ~strategy "-auth")) :profile-fields])})
             ~(symbol (str strategy "-strategy-callback"))))
-         (println "Registered " ~strategy " strategy.")))))
+         (~'log ~'DEFAULT-LOGGER :info (str "Registered " ~strategy " strategy."))))))

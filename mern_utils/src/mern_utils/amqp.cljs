@@ -1,22 +1,22 @@
 (ns mern-utils.amqp
   (:require-macros
     [mern-utils.macros :refer [node-require]])
-  (:require 
+  (:require
     [cljs.nodejs :as nodejs]
+    [mern-utils.backend-lib :refer [log DEFAULT-LOGGER]]
     [mern-utils.lib :refer [serialize]]))
 
 (node-require amqp "amqplib")
 (node-require node-when "when")
 
 (defn default-msg-handler [msg]
-  (println (str " [x] Received " msg)))
+  (log DEFAULT-LOGGER :info (str " [x] Received " msg)))
 
 (defonce amqp-state (atom {:connection nil :channel nil :default-queue "default_queue" :message-handler default-msg-handler}))
 
 (defn send-to-queue [channel queue msg]
   (.sendToQueue channel queue (js/Buffer. msg) (clj->js {:deliveryMode true}))
-  (println " [x] Sent" msg))
-;        (.close ch))))))
+  (log DEFAULT-LOGGER :info (str " [x] Sent" msg)))
 
 (defn queue-task [channel queue task]
   (send-to-queue channel queue (serialize task)))
@@ -28,12 +28,12 @@
   (swap! amqp-state assoc :channel channel)
   (doto
     (assert-queue channel (:default-queue @amqp-state) true)
-    (.then (fn [] (println "Created channel")))))
+    (.then (fn [] (log DEFAULT-LOGGER :info "Created channel")))))
 
 (defn on-connect [connection]
   (swap! amqp-state assoc :connection connection)
   (doto
-    (node-when 
+    (node-when
       (-> connection
           (.createChannel)
           (.then on-channel-created)))))
@@ -49,12 +49,12 @@
   (let [channel (:channel @amqp-state)]
     (do (.consume channel
                   (:default-queue @amqp-state)
-                  (fn [msg] 
+                  (fn [msg]
                     (let [body (.toString (.-content msg))]
                       ((:message-handler @amqp-state) body)
                       (.ack channel msg)))
                   (clj->js {:noAck false}))
-        (println " [*] Waiting for messages. To exit press CTRL+C"))))
+        (log DEFAULT-LOGGER :info " [*] Waiting for messages. To exit press CTRL+C"))))
 
 (defn worker-on-channel-created [channel]
   (swap! amqp-state assoc :channel channel)

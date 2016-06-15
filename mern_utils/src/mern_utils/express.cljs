@@ -4,14 +4,14 @@
     [mern-utils.macros :refer [node-require]])
   (:require
     [cljs.core.async :as async :refer [put!]]
-    [cljs.nodejs :as nodejs]  
+    [cljs.nodejs :as nodejs]
     [clojure.string :as string]
     [cognitect.transit :as transit]
-    [mern-utils.backend-lib :refer [local-ip]]))
+    [mern-utils.backend-lib :refer [local-ip log DEFAULT-LOGGER]]))
 
-(defn write-json-str [x]                                                        
+(defn write-json-str [x]
   (let [w (transit/writer :json-verbose)]
-    (transit/write w x))) 
+    (transit/write w x)))
 
 (node-require cors "cors")
 
@@ -28,13 +28,13 @@
     (map
       (fn [r]
         (let [m (:method r)]
-          (println "Registering: " m " " (:endpoint r))
+          (log DEFAULT-LOGGER :info (str "Registering: " m " " (:endpoint r)))
           (case m
             "get" (.get ex (:endpoint r) (cors cors-options) (:handler r))
             "post" (.post ex (:endpoint r)  (cors cors-options) (:handler r))
             "put" (.put ex (:endpoint r)  (cors cors-options) (:handler r))
             "delete" (.delete ex (:endpoint r)  cors (cors-options) (:handler r))
-            (println "    [Error] Not a METHOD: " m))))
+            (log DEFAULT-LOGGER :error (str "Not a METHOD: " m)))))
       route-table)
     )
   ex)

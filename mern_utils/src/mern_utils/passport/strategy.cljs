@@ -8,6 +8,7 @@
     [cljs-time.core :as time-core]
     [cljs-time.coerce :as time-coerce]
     [hasch.core :as hasch]
+    [mern-utils.backend-lib :refer [log DEFAULT-LOGGER]]
     [mern-utils.db :as db]
     [mern-utils.lib :refer [raise]]))
 
@@ -63,7 +64,7 @@
              (fn [err record] (if err (raise err) (then record)))))
 
 (defn refresh-api-token [api-token-model user-uid then]
-  (println "Refreshing API token for " user-uid)
+  (log DEFAULT-LOGGER :info (str "Refreshing API token for " user-uid))
   (let [api-token (create-api-token)
         data {:token (:token api-token)
               :tokenCreatedAt (:created-at api-token)}
@@ -83,7 +84,7 @@
 (defn register-new-user [strategy
                          user-model api-token-model social-account-model
                          email-domain-restriction token profile done]
-  (println "Registering a new user")
+  (log DEFAULT-LOGGER :info "Registering a new user")
   (if (and email-domain-restriction
            (or (= (.-emails profile) js/undefined)
                (not= email-domain-restriction

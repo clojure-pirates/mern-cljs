@@ -3,6 +3,7 @@
     [mern-utils.macros :refer [node-require]])
   (:require
     [cljs.nodejs :as nodejs]
+    [mern-utils.backend-lib :refer [log DEFAULT-LOGGER]]
     [mern-utils.lib :refer [resolve-cljs]]
     [mern-utils.mongoose]
     [mern-utils.vogels]))
@@ -12,7 +13,7 @@
 (defn connect [db-type endpoint & aws-config]
   (case db-type
     "mongodb"
-    (do 
+    (do
       (swap! database assoc :ns "mern-utils.mongoose")
       (node-require mongoose "mongoose")
       (.connect mongoose endpoint))
@@ -34,7 +35,7 @@
                         :region (:region aws-config)}))
             (.dynamoDriver vogels dynamodb)))))
     (throw (js/Error. "[Error] Database type" db-type "not supported.")))
-  (println "Connected to " db-type))
+  (log DEFAULT-LOGGER :info (str "Connected to " db-type)))
 
 (defn schema [fields]
   (resolve-cljs (str (:ns @database) "/schema") fields))

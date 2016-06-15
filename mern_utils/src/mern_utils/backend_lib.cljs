@@ -14,6 +14,9 @@
   (let [logger (.createLogger bunyan spec)]
     logger))
 
+(def DEFAULT-LOGGER
+  (create-logger (clj->js {:name "mern-utils"})))
+
 (defn log [logger level content]
   (case level
     :fatal (.fatal logger content)

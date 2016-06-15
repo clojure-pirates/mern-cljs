@@ -2,7 +2,8 @@
   (:require-macros
     [mern-utils.macros :refer [node-require]])
   (:require
-    [cljs.nodejs :as nodejs]))
+    [cljs.nodejs :as nodejs]
+    [mern-utils.backend-lib :refer [log DEFAULT-LOGGER]]))
 
 (node-require vogels "vogels")
 (node-require joi "joi")
@@ -56,7 +57,9 @@
 
 (defn model [model-name schema]
   (let [new-model (.define vogels model-name (clj->js (vogels-schema schema)))]
-    (.createTable new-model (fn [err result] (println "created table" model-name err result)))
+    (.createTable new-model
+                  (fn [err result]
+                    (log DEFAULT-LOGGER :info (str "created table" model-name err result))))
     new-model))
 
 (defn attrs [err record then]
