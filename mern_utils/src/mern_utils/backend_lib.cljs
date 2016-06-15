@@ -8,6 +8,21 @@
     [cemerick.url :refer [url]]
     [cljs.nodejs :as nodejs]))
 
+(node-require bunyan "bunyan")
+
+(defn create-logger [spec]
+  (let [logger (.createLogger bunyan spec)]
+    logger))
+
+(defn log [logger level content]
+  (case level
+    :fatal (.fatal logger content)
+    :error (.error logger content)
+    :warn (.warn logger content)
+    :info (.info logger content)
+    :debug (.debug logger content)
+    :trace (.trace logger content)))
+
 (defn get-location [req]
   (.-originalUrl req))
 
