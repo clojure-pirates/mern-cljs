@@ -21,6 +21,7 @@
                        [bcrypt-nodejs "0.0.3"]
                        [body-parser  "1.15.0"]
                        [bunyan "1.8.1"]
+                       [bunyan-request "1.2.0"]
                        [connect-flash "0.1.1"]
                        [cookie-parser  "1.4.1"]
                        [cors "2.7.1"]
