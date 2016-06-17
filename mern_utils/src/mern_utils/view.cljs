@@ -23,9 +23,13 @@
 (defn render-script [src]
   (str "<script>" src "</script>\n"))
 
+(defn list-meta [meta-data]
+  (map #(vector :meta {:property (:property %) :content (:content %)}) meta-data))
+
 (defsnippet page "public/template.html" [:html]
   [data & {:keys [scripts]}]
   {[:head :> :title] (content (:title data))
+   [:head] (append (list-meta (:meta-data data)))
    [:body :> :content] (content (:content data))
    [:body] (append [:div (for [src scripts]
                            ^{:key (gstring/hashCode (pr-str src))}
