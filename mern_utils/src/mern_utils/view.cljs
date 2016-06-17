@@ -24,7 +24,7 @@
   (str "<script>" src "</script>\n"))
 
 (defn list-meta [meta-data]
-  (map #(vector :meta {:property (:property %) :content (:content %)}) meta-data))
+  (map #(vector :meta %) meta-data))
 
 (defsnippet page "public/template.html" [:html]
   [data & {:keys [scripts]}]
