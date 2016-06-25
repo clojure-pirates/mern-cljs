@@ -1,0 +1,24 @@
+www:
+  build: ./www
+  ports:
+   - "80:1337"
+  volumes:
+   - .:/home/merncljs/mern-cljs/example
+  privileged: true
+  entrypoint: /home/merncjljs/mern-cljs/example/bin/run-app
+
+api:
+  build: ./api
+  ports:
+   - "5000:5000"
+  volumes:
+   - .:/home/merncljs/mern-cljs/example
+  privileged: true
+  entrypoint: /home/merncjljs/mern-cljs/example/bin/run-app
+
+worker:
+  build: ./worker
+  volumes:
+   - .:/home/merncljs/mern-cljs/example
+  privileged: true
+  entrypoint: /home/merncjljs/mern-cljs/example/bin/run-app

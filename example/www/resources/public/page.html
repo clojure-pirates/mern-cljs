@@ -14,29 +14,27 @@
     <content> <div id="container" class="container-fluid">
       <div id="header" class="row"><div>
         <div id="logo" class="pull-left col-md-3">
-          <span class="title">MERN-cljs demo</span>
+          <span class="title"></span>
+          <div class="byline">
+          </div>
         </div>
         <div id="me" class="pull-right col-md-4">
           <div id="profile" class="pull-right">
             <i id="profile-loading" class="fa fa-spinner fa-spin show"></i>
-            <img id="profile-pic" class="hide" src="/image/facebook-profile-picture.jpg"/>
-            &nbsp;<span id="profile-greetings" class="hide">
-              <span id="greetings">You are awesome,</span>&nbsp;
-              <span id="user-fullname">Emi Tanaka</span>!!
-            </span>
+            <span id="profile-login-button" class="hide"><a id="profile-login-link" href="/login">Login</a></span>
+            <img id="profile-pic" class="hide" src="/image/facebook-profile-picture.jpg"/>&nbsp;
+              <span id="profile-greetings" class="hide">
+                <span id="greetings">You're awesome,</span>&nbsp;
+                <span id="user-fullname"></span>!!
+              </span>
           </div>
-        </div></div>
-      </div>
+        </div>
+      </div></div>
       <div id="flash" class="alert alert-info hide"><div>
         <span id="flash-message">Oops! Our server is down!</span>
       </div></div>
       <div class="row">
-        <div id="menu" class="col-md-3">
-          <ul>
-            <li><a href="#">Menu item #1</a></li>
-          </ul>
-        </div>
-        <div id="content" class="pull-right col-md-9 hide"><div>
+        <div id="content" class="pull-right col-md-12"><div>
         </div></div>
       </div>
     </div></content>

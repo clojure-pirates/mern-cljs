@@ -8,17 +8,46 @@
     <title></title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
-    <link href="/css/custom.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
   </head>
   <body>
     <content> <div id="container" class="container-fluid">
-      <div id="login">
-        Please login<br/>
-        <a href="/auth/facebook"><img src="/image/fb_login.png"/></a>
+      <div id="header" class="row"><div>
+        <div id="logo" class="pull-left col-md-3">
+          <span class="title"></span>
+          <div class="byline">
+          </div>
+        </div>
+        <div id="me" class="pull-right col-md-4">
+          <div id="profile" class="pull-right">
+            <i id="profile-loading" class="fa fa-spinner fa-spin hide"></i>
+            <span id="profile-login-button" class="show">Login</span>
+            <img id="profile-pic" class="hide" src="/image/facebook-profile-picture.jpg"/>
+            &nbsp;<span id="profile-greetings" class="hide">
+              <span id="greetings">You are awesome,</span>&nbsp;
+              <span id="user-fullname"></span>!!
+            </span>
+          </div>
+        </div></div>
+      </div>
+      <div id="flash" class="alert alert-info hide"><div>
+        <span id="flash-message">Oops! Our server is down!</span>
+      </div></div>
+      <div class="row">
+        <div id="menu" class="col-md-3">
+          <ul>
+            <li><a href="/">Home</a></li>
+          </ul>
+        </div>
+        <div id="content" class="landing pull-right col-md-9"><div>
+          <div id="login">
+            Log-on with Facebook to continue!<br/>
+            <a href="/auth/facebook"><img src="/image/fb_login.png" class="figure" /></a>
+          </div>
+        </div></div>
       </div>
     </div></content>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <div id="fb-root"></div>
   </body>
 </html>

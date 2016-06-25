@@ -7,27 +7,28 @@
     [clojure.string :as str]
     [mern-utils.amqp :refer [start-worker]]
     [mern-utils.db :as db]
-    [mern-utils.backend-lib :refer [local-ip]]
     [mern-utils.lib :refer [deserialize resolve-cljs]]
-    [common.config :refer [DATABASE DB-ENDPOINT AWS-CONFIG
-                           RABBITMQ-DOMAIN RABBITMQ-PORT]]))
+    [mern-utils.backend-lib :refer [local-ip log]]
+    [common.config :refer [LOGGER
+                           DATABASE DB-ENDPOINT AWS-CONFIG
+                           RABBITMQ-ENDPOINT
+                           ]]
+    ))
 
 (enable-console-print!)
 
 (node-require amqp "amqplib")
 
-(def amqp-endpoint (str "amqp://" RABBITMQ-DOMAIN ":" RABBITMQ-PORT))
+(defn ^:export log-message [data]
+  (log LOGGER :info (str "Received message: " (:message data))))
 
-; Note "^:export" is necessary for a function to be called by resolve-cljs
-(defn ^:export log [data]
-  (println "[info] Received message:" (:message data)))
- 
 (defn task-handler [string]
+  (log LOGGER :info (str "Received message: " string))
   (let [task (deserialize string)]
     (resolve-cljs (str "worker.core/" (:fn task)) (:data task))))
 
 (defn -main [& mess]
   (db/connect DATABASE DB-ENDPOINT AWS-CONFIG)
-  (start-worker amqp-endpoint task-handler #(println (str "Worker running at http://" local-ip))))
+  (start-worker RABBITMQ-ENDPOINT task-handler #(log LOGGER :info (str "Worker running at http://" local-ip))))
 
 (set! *main-cli-fn* -main)

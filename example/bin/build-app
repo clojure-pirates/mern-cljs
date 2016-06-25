@@ -1,0 +1,7 @@
+#!/bin/bash
+mkdir logs
+rm package.json
+lein clean
+lein with-profile +prod compile
+lein npm install
+cp package.json.org package.json

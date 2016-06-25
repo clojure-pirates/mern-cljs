@@ -1,5 +1,5 @@
 (defproject mern-cljs-example-worker "0.1.1-SNAPSHOT"
-  :description "MERN-Cljs Example Worker"
+  :description "MERN-cljs Example"
   :url "https://github.com/daigotanaka/mern-cljs"
   :license {:name "MIT License"
             :url ""}
@@ -7,22 +7,13 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.48"]
                  [org.clojure/core.async "0.1.346.0-17112a-alpha"]
+                 ; Added by Daigo
                  [com.cognitect/transit-cljs "0.8.220"]
                  [com.cemerick/piggieback "0.2.1"]
                  [com.cemerick/url "0.1.1"]
                  [cljs-ajax "0.5.3"]
                  [net.polyc0l0r/hasch "0.2.3"]
                  ]
-
-  :npm {:dependencies [[xmlhttprequest "1.8.0"]
-                       [source-map-support "0.4.0"]
-                       [aws-sdk "2.3.3"]
-                       [mongoose "4.4.12"]
-                       [vogels "2.2.0"]
-                       [amqplib "latest"]
-                       [when "latest"]
-                       ]
-        :root :root}
 
   :plugins [[lein-cljsbuild "1.1.0"]
             [lein-npm "0.6.1"]]
@@ -33,45 +24,51 @@
 
   :aliases {"start" ["npm" "start"]}
 
-  :main "main.js"
+  :main "js/main.js"
 
   :source-paths ["src"]
 
+  :target-path "js/target"
+
   :clean-targets ^{:protect false} [[:cljsbuild :builds :worker :compiler :output-to]
-                                    :target-path :compile-path]
+                                     :target-path :compile-path]
 
   :figwheel {:http-server-root "public"
+             :css-dirs ["resources/public/css"]
              :server-logfile "logs/figwheel.log"}
 
-  :cljsbuild {:builds
-               {
-               :worker
-               {:source-paths ["src"]
-                :compiler {:target :nodejs
-                           :output-to "main.js"
-                           :output-dir "target"
-                           :main worker.core
-                           :figwheel true
-                           :optimizations :none}
-                }}}
+  :cljsbuild
+  {:builds
+   {:worker
+    {:source-paths ["src"]
+     :compiler {:target :nodejs
+                :output-to "js/main.js"
+                :output-dir "js/target"
+                :main worker.core}}}}
 
-  :profiles {:dev
-             {:plugins
-              [[lein-figwheel "0.3.9"]]
-              :cljsbuild
-              {:builds
-               {:worker
-                {:compiler {:pretty-print true}
-                 :source-map true
-                 :figwheel {:heads-up-display false}}}}
-              :npm {:dependencies [[ws "*"]]}}
+  :profiles
+  {:dev
+   {:plugins [[lein-figwheel "0.3.9"]]
 
-             :prod
-             {:env {:production true}
-              :cljsbuild
-              {:builds
-               {:server
-                {:compiler {:optimizations :simple
-                            :foreign-libs [{:file "src/polyfill/simple.js"
-                                            :provides ["polyfill.simple"]}]
-                            :pretty-print false}}}}}})
+    :cljsbuild
+    {:builds
+     {:worker
+      {:compiler
+       {:pretty-print true
+        :optimizations :none
+        :source-map true
+        :figwheel {:heads-up-display false}
+        :npm {:dependencies [[ws "*"]]}}}}}}
+
+   :prod
+   {:env {:production true}
+
+    :cljsbuild
+    {:builds
+     {:worker
+      {:compiler
+       {:optimizations :simple
+        :source-map "js/main.js.map"
+        :foreign-libs [{:file "src/polyfill/simple.js"
+                        :provides ["polyfill.simple"]}]
+        :pretty-print false}}}}}})

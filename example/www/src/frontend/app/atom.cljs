@@ -7,10 +7,12 @@
     {:url-params {}
      :flash-shown false
      :flash-message ""
+     :menu-logout-shown false
      :profile-greetings-shown false
      :profile-loading-shown true
+     :profile-login-button-shown false
      :profile-pic-shown false
-     :profile-greetings "Hello"
-     :user {:name "" :photo "/image/facebook-profile-picture.jpg"}
+     :profile-greetings ""
+     :user {:name "" :photo ""}
      :content-shown false
      }))

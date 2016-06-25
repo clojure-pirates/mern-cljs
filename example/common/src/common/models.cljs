@@ -1,7 +1,7 @@
-(ns common.models 
+(ns common.models
   (:require-macros
     [mern-utils.macros :refer [node-require]])
-  (:require 
+  (:require
     [cljs.nodejs :as nodejs]
     [mern-utils.db :as db]
     [common.models.user-schema :refer [user-schema api-token-schema

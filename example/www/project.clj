@@ -1,5 +1,5 @@
 (defproject mern-cljs-example-www "0.1.1-SNAPSHOT"
-  :description "MERN-Cljs Example WWW"
+  :description "MERN-cljs Example"
   :url "https://github.com/daigotanaka/mern-cljs"
   :license {:name "MIT License"
             :url ""}
@@ -18,29 +18,6 @@
                  [net.polyc0l0r/hasch "0.2.3"]
                  ]
 
-  :npm {:dependencies [[express "4.13.3"]
-                       [xmlhttprequest "*"]
-                       [xmldom "0.1.19"]
-                       [source-map-support "*"]
-                       [react "0.13.3"]
-                       ; Added by Daigo
-                       [cors "2.7.1"]
-                       [passport "0.3.2"]
-                       [passport-local "latest"]
-                       [passport-facebook "latest"]
-                       [passport-google-oauth "latest"]
-                       [aws-sdk "2.3.3"]
-                       [mongoose "4.4.12"]
-                       [vogels "2.2.0"]
-                       [express-session "1.13.0"]
-                       [bcrypt-nodejs "0.0.3"]
-                       [connect-flash "0.1.1"]
-                       [morgan  "1.7.0"]
-                       [body-parser  "1.15.0"]
-                       [cookie-parser  "1.4.1"]
-                       ]
-        :root :root}
-
   :plugins [[lein-cljsbuild "1.1.0"]
             [lein-npm "0.6.1"]]
 
@@ -50,9 +27,11 @@
 
   :aliases {"start" ["npm" "start"]}
 
-  :main "main.js"
+  :main "js/main.js"
 
   :source-paths ["src"]
+
+  :target-path "js/target"
 
   :clean-targets ^{:protect false} [[:cljsbuild :builds :backend :compiler :output-to]
                                     [:cljsbuild :builds :frontend :compiler :output-dir]
@@ -62,51 +41,58 @@
              :css-dirs ["resources/public/css"]
              :server-logfile "logs/figwheel.log"}
 
-  :cljsbuild {:builds
-               {
-               :frontend
-               {:source-paths ["src/frontend"]
-                :compiler {:output-to "resources/public/js/out/app.js"
-                           :output-dir "resources/public/js/out"
-                           :asset-path "/js/out"
-                           :main app.start
-                           :optimizations :none}}
+  :cljsbuild
+  {:builds
+   {:frontend
+    {:source-paths ["src/frontend"]
+    :compiler {:output-to "resources/public/js/out/app.js"
+               :output-dir "resources/public/js/out"
+               :asset-path "/js/out"
+               :main app.start}}
 
-               :backend
-               {:source-paths ["src/backend"]
-                :compiler {:target :nodejs
-                           :output-to "main.js"
-                           :output-dir "target"
-                           :main server.core
-                           :figwheel true
-                           :optimizations :none}
-                }}}
+    :backend
+    {:source-paths ["src/backend"]
+     :compiler {:target :nodejs
+                :output-to "js/main.js"
+                :output-dir "js/target"
+                :main server.core}}}}
 
-  :profiles {:dev
-             {:plugins
-              [[lein-figwheel "0.3.9"]]
-              :cljsbuild
-              {:builds
-               {:frontend
-                {:compiler {:pretty-print true}
-                 :source-map true
-                 :figwheel true}
-                :backend
-                {:compiler {:pretty-print true}
-                 :source-map true
-                 :figwheel {:heads-up-display false}}}}
-              :npm {:dependencies [[ws "*"]]}}
+  :profiles
+  {:dev
+   {:plugins [[lein-figwheel "0.3.9"]]
 
-             :prod
-             {:env {:production true}
-              :cljsbuild
-              {:builds
-               {:server
-                {:compiler {:optimizations :simple
-                            :foreign-libs [{:file "src/backend/polyfill/simple.js"
-                                            :provides ["polyfill.simple"]}]
-                            :pretty-print false}}
-                :app
-                {:compiler {:output-dir "target/app/out"
-                            :optimizations :advanced
-                            :pretty-print false}}}}}})
+    :cljsbuild
+    {:builds
+     {:frontend
+      {:compiler {:pretty-print true}
+       :source-map true
+       :figwheel true
+       :optimizations :none
+       }
+
+      :backend
+      {:compiler
+       {:pretty-print true
+        :optimizations :none
+        :source-map true
+        :figwheel {:heads-up-display false}
+        :npm {:dependencies [[ws "*"]]}}}}}}
+
+   :prod
+   {:env {:production true}
+
+    :cljsbuild
+    {:builds
+     {:frontend
+      {:compiler
+       {:optimizations :advanced
+        :source-map "resources/public/js/out/app.js.map"
+        :pretty-print false}}
+
+      :backend
+      {:compiler
+       {:optimizations :simple
+        :source-map "js/main.js.map"
+        :foreign-libs [{:file "src/backend/polyfill/simple.js"
+                        :provides ["polyfill.simple"]}]
+        :pretty-print false}}}}}})

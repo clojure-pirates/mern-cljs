@@ -1,9 +1,70 @@
-#profile-pic {
-  width: 50px;
-  height: 50px;
+body {
+  font-family: sans-serif;
 }
 
-#profile-loading img {
-  width: 50px;
-  height: 50px;
+a {
+  text-decoration: none !important;
+}
+
+.container-fluid {
+  max-width: 1024px
+}
+
+#header {
+  height: 72px;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-family: serif;
+  font-size: 36px;
+  font-weight: bold;
+  margin-left: 28px;
+}
+
+.byline {
+  margin-top: -5px;
+  margin-left: 5px;
+  font-family: serif;
+  font-size: 18px;
+}
+
+.byline > i {
+  font-size: 14px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.landing {
+  font-size: 18px;
+}
+
+#profile {
+  margin-top: 23px;
+}
+
+#profile > img {
+  width: 25px;
+}
+
+#profile-pic.show {
+  display: inline !important;
+}
+
+#profile-greetings.show
+{
+  display: inline !important;
+}
+
+#menu {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#menu > div > ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
 }

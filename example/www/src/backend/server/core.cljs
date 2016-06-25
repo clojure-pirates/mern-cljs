@@ -5,10 +5,11 @@
     [polyfill.compat]
     [cljs.nodejs :as nodejs]
     [mern-utils.db :as db]
-    [mern-utils.backend-lib :refer [local-ip]]
+    [mern-utils.backend-lib :refer [local-ip log]]
     [mern-utils.express :refer [route]]
     [mern-utils.passport.strategy :refer [config-passport]]
-    [common.config :refer [DATABASE DB-ENDPOINT AWS-CONFIG WWW-DOMAIN WWW-PORT config-auth cors-options]]
+    [common.config :refer [LOGGER COOKIE-SECRET DATABASE DB-ENDPOINT AWS-CONFIG
+                           WWW-DOMAIN WWW-PORT config-auth cors-options]]
     [common.models :refer [user-model api-token-model facebook-account-model google-account-model]]
     [server.handlers :refer [route-table]]))
 
@@ -22,15 +23,21 @@
 (node-require morgan "morgan")
 (node-require body-parser "body-parser")
 (node-require cookie-parser "cookie-parser")
+(node-require bunyan-request "bunyan-request")
 
 (defn server [success]
   (doto (express)
+;    (.use (bunyan-request (clj->js {:headerName "X-Request-Id"
+;                                       :propertyName "reqId"
+;                                       :logName "req_id"
+;                                       :obscureHeaders []
+;                                       :logger LOGGER})))
     (.use (cors))
     (.use (.static express "resources/public"))
     (.use (morgan "dev"))
-    (.use (cookie-parser "very secret"))
+    (.use (cookie-parser COOKIE-SECRET))
     (.use (body-parser))
-    (.use (express-session (clj->js {:secret "very secret"
+    (.use (express-session (clj->js {:secret COOKIE-SECRET
                                      :resave false
                                      :saveUninitialized true
                                      :cookie {:maxAge (* 1000 60 60)}})))
@@ -45,6 +52,6 @@
 (defn -main [& mess]
   (db/connect DATABASE DB-ENDPOINT AWS-CONFIG)
   (config-passport passport config-auth (user-model) (api-token-model) (facebook-account-model) (google-account-model))
-  (server #(println (str "Server running at http://" local-ip ":" WWW-PORT "/"))))
+  (server #(log LOGGER :info (str "Server running at http://" local-ip ":" WWW-PORT "/"))))
 
 (set! *main-cli-fn* -main)

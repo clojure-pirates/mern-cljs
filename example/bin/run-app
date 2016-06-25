@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PWD=`pwd`
+APP=`basename $PWD`
+echo $APP
+pm2 start js/main.js --name $APP --no-daemon -i 0
