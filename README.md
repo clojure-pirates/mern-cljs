@@ -45,12 +45,12 @@ brew services start mongodb
 Run the example API server
 
 ```
-cd example/api 
+cd example/api
 lein compile
 lein run
 ```
 
-Run the web app 
+Run the web app
 
 ```
 cd example/www
@@ -58,7 +58,7 @@ lein compile
 lein run
 ```
 
-Point the browser to `http://localhost:1337/profile`
+Point the browser to `http://localhost:1337/me`
 (API server is served on port 5000 by default.)
 
 ## About the source code
@@ -72,7 +72,8 @@ It contains configurations and object models:
 
 #### Configuration file
 
-example/common/src/common/config.cljs 
+example/common/src/common/config.cljs
+example/common/src/common/frontend_config.cljs
 
 #### Object models
 
@@ -121,13 +122,29 @@ it requires RabbitMQ. See Async tasks section to find how to turn it on.
 - example/worker/src/worker/core.cljs: Core async task logic and example task
   ("log" function)
 
-## About API Authentication process
+## Authentication
+
+### Social Login
+
+The example app is set to login via Facebook account. For your convenience,
+an Facebook application is made for demonstration purpose. The demo application's
+`FACEBOOK-CLIENT-ID` and `FACEBOOK-CLIENT-SECRET` are set in
+`example/common/src/common/config.cljs`. When you create your own application,
+you will need to set up your own application.
+[Easy Node Authentication: Facebook](https://scotch.io/tutorials/easy-node-authentication-facebook)
+has a good explanation on how to set up for node.js applications.
+
+### API Authentication process
 
 Frontend app tries to fetch `me` resource. If it fails, it will redirect to
 Social auth. WWW backend authenticates via Passport.js and write information
 on MongoDB with a one time API token. Token is passed on to the frontend and
-it is used to API auth. In the example app, it will be redirected to profile
+it is used to API auth. In the example app, it will be redirected to me
 page to fetch `me` resource with proper authentication.
+
+## Logging
+
+[Bunyan](https://github.com/trentm/node-Bunyan) is used for logging. Please refer to the doc.
 
 ## Async tasks
 
@@ -202,3 +219,46 @@ DynamoDB local's default port is 8000. The config variable `DYNAMODB-PORT` is
 also set as 8000 in the example app.
 
 Recompile and start www and api (and worker) apps.
+
+## Deployment to AWS
+
+The production build of an application based on MERN-cljs has been deployed on
+[Docker](https://www.docker.com/) containers on EC2 instances. The application
+uses DyanmoDB on AWS and [CloudAMQP](https://www.cloudamqp.com/) for the database
+and RabbitMQ.
+
+### Compiling production code
+
+You should compile ClojureScript with `prod` profile when building the production
+version. For example,
+
+```
+cd example/www
+lein with-profile +prod compile
+```
+
+**Don't forget `+` before prod.**
+
+The compilation takes much longer than building development version, but
+the code is optimized. Front-end code does not even run on development version
+on Safari browser due to the number of dependencies that needs to be loaded.
+The production version bundles all the dependencies and minifies. It loads
+and runs much faster.
+
+### Docker files
+
+I put these example Docker files. They do not work as they are and you need
+to set up proper path and environmental variables, but will give you the idea
+how to set up. Please refer to Docker document for how to use them.
+
+- example/Dockerfile: Build a Docker image that has node.js, npm packages, and
+  lein. Dockerfiles under each component picks up from the above Docker image
+  and set up the image for each container:
+    - example/api/Dockerfile
+    - example/www/Dockerfile
+    - example/worker/Dockerfile
+
+If you want to run all the component in one EC2 instance, Docker Compose may
+be handy and here is the yml file:
+
+- example/docker-compose.yml

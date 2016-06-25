@@ -43,7 +43,7 @@
     "mongodb" (str "mongodb://" MONGODB-DOMAIN ":" MONGODB-PORT "/" MONGODB-DBNAME)
     "dynamodb" (if IS-PRODUCTION nil (str "http://" DYNAMODB-DOMAIN ":" DYNAMODB-PORT))))
 
-(def USE-RABBITMQ true)
+(def USE-RABBITMQ false)
 (def RABBITMQ-DOMAIN (if IS-PRODUCTION (.. nodejs/process -env -RABBITMQ_DOMAIN) LOCAL-IP))
 (def RABBITMQ-PORT (if IS-PRODUCTION (.. nodejs/process -env -RABBITMQ_PORT) 5672))
 (def RABBITMQ-USER (if IS-PRODUCTION (.. nodejs/process -env -RABBITMQ_USER) ""))
