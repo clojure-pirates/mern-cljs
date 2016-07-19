@@ -35,6 +35,7 @@
                        [passport-google-oauth "1.0.0"]
                        [passport-local "1.0.0"]
                        [react "0.13.3"]
+                       [request "2.72.0"]
                        [source-map-support "0.4.0"]
                        [vogels "2.2.0"]
                        [when "3.7.7"]
