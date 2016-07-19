@@ -9,6 +9,8 @@
     [cljs.nodejs :as nodejs]))
 
 (node-require bunyan "bunyan")
+(node-require fs "fs")
+(node-require request  "request")
 
 (defn create-logger [spec]
   (let [logger (.createLogger bunyan spec)]
@@ -85,3 +87,13 @@
           address
           (if (< 1 (count ifnames))
             (recur (pop ifnames))))))))
+
+(defn download
+  [uri filename then on-err]
+  (.pipe (request
+           (clj->js {:uri uri :timeout 3000})
+           (fn [err res body] (if err (on-err))))
+         (-> fs
+             (.createWriteStream filename)
+             (.on "close" then)
+             (.on "error" on-err))))
