@@ -17,7 +17,7 @@
     :aws {:region "" :access-key-id "" :secret-access-key ""}
   params will be passed on to (then params) or (on-err err params)"
   (set! (.. s3 -AWS -config -region) (:region (:aws params)))
-  (let [full-path (str (:path params) (:file-name params))
+  (let [full-path (str (:path params) "/" (:file-name params))
         s3-client (.createClient s3
                     (clj->js {:maxAsyncS3 20 ; this is the default
                               :s3RetryCount 3 ; this is the default

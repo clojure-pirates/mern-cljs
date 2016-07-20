@@ -91,7 +91,11 @@
 (defn download
   [uri filename then on-err]
   (.pipe (request
-           (clj->js {:uri uri :timeout 3000})
+           (clj->js {:uri uri
+                     :headers
+                     {:User-Agent
+                      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0"}
+                     :timeout 3000})
            (fn [err res body] (if err (on-err))))
          (-> fs
              (.createWriteStream filename)
