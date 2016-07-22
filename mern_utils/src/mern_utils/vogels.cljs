@@ -96,13 +96,18 @@
     (-> model
         (.query (hashkey query-key)))))
 
+(defn scan
+  [model]
+  (.scan model))
+
 (defn exec [query then]
   (.exec query then))
 
-(defn where [query query-key]
-  (let [rangekey (first (keys query-key))]
-    (-> model
-        (.query (rangekey query-key)))))
+(defn where [scan key-]
+  (.where scan (name key-)))
+
+(defn equals [where value]
+  (.equals where value))
 
 (defn using-index [query index]
   (.usingIndex (str (name index) "_index")))

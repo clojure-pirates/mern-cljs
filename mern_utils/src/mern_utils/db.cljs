@@ -66,3 +66,15 @@
 
 (defn query [model query]
   (resolve-cljs (str (:ns @database) "/query") model query))
+
+(defn scan [model]
+  (resolve-cljs (str (:ns @database) "/scan") model))
+
+(defn where [scan key-]
+  (resolve-cljs (str (:ns @database) "/where") scan key-))
+
+(defn equals [where value]
+  (resolve-cljs (str (:ns @database) "/equals") where value))
+
+(defn exec [query then]
+  (resolve-cljs (str (:ns @database) "/exec") query then))
