@@ -76,5 +76,8 @@
 (defn equals [where value]
   (resolve-cljs (str (:ns @database) "/equals") where value))
 
+(defn descending [query]
+  (resolve-cljs (str (:ns @database) "/descending") query))
+
 (defn exec [query then]
   (resolve-cljs (str (:ns @database) "/exec") query then))

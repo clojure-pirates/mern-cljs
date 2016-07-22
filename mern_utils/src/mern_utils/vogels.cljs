@@ -90,21 +90,20 @@
           (create model data-w-key then))
         (then err record)))))
 
-(defn query
-  [model query-key]
-  (let [hashkey (first (keys query-key))]
-    (-> model
-        (.query (hashkey query-key)))))
+(defn query [model hashkey]
+  (.query model hashkey ))
 
-(defn scan
-  [model]
+(defn scan [model]
   (.scan model))
 
 (defn exec [query then]
   (.exec query then))
 
-(defn where [scan key-]
-  (.where scan (name key-)))
+(defn descending [query]
+  (.descending query))
+
+(defn where [query key-]
+  (.where query (name key-)))
 
 (defn equals [where value]
   (.equals where value))
