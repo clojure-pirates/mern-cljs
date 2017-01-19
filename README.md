@@ -28,6 +28,10 @@ ClojureScript and node.js. This way, I can take advantage of very rich set of
 JavaScript libraries managed by [npm](https://www.npmjs.com). I don't have to
 switch language (e.g. Python <-> JavaScript) to develop backend and frontend.
 
+## An example web app
+
+[Selquote](http://selquote.com): Highlight a web page and click the bookmarklet to create a beautiful quote text image. The async worker generate image as API server put the tasks to AMQP.
+
 ## What you need to install
 
 1. Node.js
